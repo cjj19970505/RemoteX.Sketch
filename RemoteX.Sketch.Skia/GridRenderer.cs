@@ -54,12 +54,6 @@ namespace RemoteX.Sketch.Skia
                     canvas.DrawText(skiaToSketch.MapPoint(point).ToString(), point, _TextPaint);
                 }
             }
-            
-            
-
-            
-
-
         }
     }
 }
