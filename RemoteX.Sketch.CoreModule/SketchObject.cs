@@ -24,20 +24,22 @@ namespace RemoteX.Sketch.CoreModule
         {
         }
 
-        protected virtual void OnInstantiated()
+        protected internal virtual void OnInstantiated()
         {
 
         }
 
-        protected virtual void Update()
+        protected internal virtual void Update()
         {
 
         }
 
-        protected virtual void Start()
+        protected internal virtual void Start()
         {
 
         }
+
+        
         
     }
 }

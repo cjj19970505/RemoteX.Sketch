@@ -6,13 +6,24 @@ namespace RemoteX.Sketch.CoreModule
 {
     public class SketchEngine
     {
+        public Time Time { get; }
+
         private readonly List<SketchObject> _SketchObjectList;
         private readonly List<SketchObject> _ReadyToInstantiateSketchObjectList;
 
+        public IReadOnlyList<SketchObject> SketchObjectList
+        {
+            get
+            {
+                return _SketchObjectList;
+            }
+        }
 
         public SketchEngine()
         {
             _SketchObjectList = new List<SketchObject>();
+            _ReadyToInstantiateSketchObjectList = new List<SketchObject>();
+            Time = new Time();
 
         }
         /// <summary>
@@ -22,7 +33,11 @@ namespace RemoteX.Sketch.CoreModule
         /// <returns></returns>
         public T Instantiate<T>() where T : SketchObject, new()
         {
-            throw new NotImplementedException();
+            T skiaObject = new T();
+            skiaObject.SketchEngine = this;
+            _ReadyToInstantiateSketchObjectList.Add(skiaObject);
+            
+            return skiaObject;
         }
 
         /// <summary>
@@ -33,10 +48,24 @@ namespace RemoteX.Sketch.CoreModule
         {
             throw new NotImplementedException();
         }
-        
-        public void Update()
+
+        public void Update(float deltaTime)
         {
-            throw new NotImplementedException();
+            Time.DeltaTime = deltaTime;
+            foreach (var sketchObject in _ReadyToInstantiateSketchObjectList)
+            {
+                _SketchObjectList.Add(sketchObject);
+                sketchObject.IsInstantiated = true;
+                sketchObject.OnInstantiated();
+            }
+            _ReadyToInstantiateSketchObjectList.Clear();
+            foreach (var sketchObject in _SketchObjectList)
+            {
+                sketchObject.Update();
+            }
+            
         }
+
+        
     }
 }

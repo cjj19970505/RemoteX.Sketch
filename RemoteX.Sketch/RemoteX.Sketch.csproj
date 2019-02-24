@@ -4,4 +4,25 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RemoteX.Sketch.CoreModule\RemoteX.Sketch.CoreModule.csproj" />
+    <ProjectReference Include="..\RemoteX.Sketch.Skia\RemoteX.Sketch.Skia.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.UI.Xaml.Markup">
+      <HintPath>Microsoft.UI.Xaml.Markup.winmd</HintPath>
+      <IsWinMDFile>true</IsWinMDFile>
+    </Reference>
+    <Reference Include="RemoteX.Core">
+      <HintPath>RemoteX.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="RemoteX.Data">
+      <HintPath>RemoteX.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="RemoteX.Input">
+      <HintPath>RemoteX.Input.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
