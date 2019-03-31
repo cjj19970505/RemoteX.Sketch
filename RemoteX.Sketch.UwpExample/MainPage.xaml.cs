@@ -45,7 +45,7 @@ namespace RemoteX.Sketch.UwpExample
             var skiaManager = sender as SkiaManager;
             SKMatrix.MakeTranslation(0, e.LocalClipBounds.Height);
             var matrix = skiaManager.SketchSpaceToCanvasSpaceMatrix;
-            matrix.SetScaleTranslate(1, -1, 0, e.LocalClipBounds.Height/2);
+            matrix.SetScaleTranslate(0.2f, -0.2f, e.LocalClipBounds.Width / 2, e.LocalClipBounds.Height/2);
             skiaManager.SketchSpaceToCanvasSpaceMatrix = matrix;
         }
 

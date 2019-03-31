@@ -7,6 +7,10 @@ namespace RemoteX.Sketch.CoreModule
     public class SketchEngine
     {
         public Time Time { get; }
+        /// <summary>
+        /// 但进入Update时这个会被锁住，各位若要在update之外访问Sketch内的资源时请使用这货
+        /// </summary>
+        public object UpdateLock { get; private set; }
 
         private readonly List<SketchObject> _SketchObjectList;
         private readonly List<SketchObject> _ReadyToInstantiateSketchObjectList;
@@ -24,6 +28,7 @@ namespace RemoteX.Sketch.CoreModule
             _SketchObjectList = new List<SketchObject>();
             _ReadyToInstantiateSketchObjectList = new List<SketchObject>();
             Time = new Time();
+            UpdateLock = new object();
 
         }
         /// <summary>
@@ -51,18 +56,22 @@ namespace RemoteX.Sketch.CoreModule
 
         public void Update(float deltaTime)
         {
-            Time.DeltaTime = deltaTime;
-            foreach (var sketchObject in _ReadyToInstantiateSketchObjectList)
+            lock (UpdateLock)
             {
-                _SketchObjectList.Add(sketchObject);
-                sketchObject.IsInstantiated = true;
-                sketchObject.OnInstantiated();
+                Time.DeltaTime = deltaTime;
+                foreach (var sketchObject in _ReadyToInstantiateSketchObjectList)
+                {
+                    _SketchObjectList.Add(sketchObject);
+                    sketchObject.IsInstantiated = true;
+                    sketchObject.OnInstantiated();
+                }
+                _ReadyToInstantiateSketchObjectList.Clear();
+                foreach (var sketchObject in _SketchObjectList)
+                {
+                    sketchObject.Update();
+                }
             }
-            _ReadyToInstantiateSketchObjectList.Clear();
-            foreach (var sketchObject in _SketchObjectList)
-            {
-                sketchObject.Update();
-            }
+            
             
         }
 

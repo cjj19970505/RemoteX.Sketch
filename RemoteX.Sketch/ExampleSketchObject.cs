@@ -19,7 +19,8 @@ namespace RemoteX.Sketch
             {
                 Color = SKColors.Red
             };
-            canvas.DrawCircle(skiaManager.SketchSpaceToCanvasSpaceMatrix.MapPoint(Position), 50, paint);
+            
+            canvas.DrawCircle(skiaManager.SketchSpaceToCanvasSpaceMatrix.MapPoint(Position), skiaManager.SketchSpaceToCanvasSpaceMatrix.MapRadius(50), paint);
         }
 
         protected override void Update()

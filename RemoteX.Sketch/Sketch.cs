@@ -17,6 +17,8 @@ namespace RemoteX.Sketch
         public float DesiredFrameRate { get; set; }
         public float Width { get; set; }
         public float Height { get; set; }
+
+        
         
         public Sketch()
         {
@@ -26,8 +28,8 @@ namespace RemoteX.Sketch
             UpdateTimer.Elapsed += UpdateTimer_Elapsed;
             UpdateTimer.Interval = 1 / DesiredFrameRate * 1000;
             SkiaManager = SketchEngine.Instantiate<SkiaManager>();
-            
-            
+
+
         }
         
         public void Start()
