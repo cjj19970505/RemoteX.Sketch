@@ -8,7 +8,7 @@ namespace RemoteX.Sketch.CoreModule
     {
         public Time Time { get; }
         /// <summary>
-        /// 但进入Update时这个会被锁住，各位若要在update之外访问Sketch内的资源时请使用这货
+        /// 但进入Update时这个会被锁住，各位若要在update之外访问Sketch内的资源时请使用这
         /// </summary>
         public object UpdateLock { get; private set; }
 
