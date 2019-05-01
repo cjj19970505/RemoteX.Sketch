@@ -11,5 +11,6 @@
 
     <Grid>
         <skia:SKXamlCanvas x:Name="SKCanvasView" PaintSurface="SKCanvasView_PaintSurface"/>
+        <Rectangle x:Name="InputLayerRect" Fill="Red" Opacity="0"/>
     </Grid>
 </Page>

@@ -10,7 +10,7 @@ namespace RemoteX.Sketch.Skia
     {
         //public float IntervalX { get; set; }
         //public float IntervalY { get; set; }
-        public float Base = 10;
+        public float Base = 100;
         readonly SKPaint _TextPaint = new SKPaint
         {
             TextSize = 20,
@@ -48,14 +48,14 @@ namespace RemoteX.Sketch.Skia
 
             
             /*
-            for (int i = nRect.Bottom; i <= nRect.Top; i++)
+            for (int i = nRect.Bottom;s i <= nRect.Top; i++)
             {
                 var point0 = new SKPoint(i * intervalXSketchSpace, 0);
                 var point1 = new SKPoint(i * intervalXSketchSpace, canvas.LocalClipBounds.Height);
                 canvas.DrawLine(point0, point1, _LinePaint);
             }
             */
-            System.Diagnostics.Debug.WriteLine(nRect);
+            //System.Diagnostics.Debug.WriteLine(nRect);
             for (int i = nRect.Left; i <= nRect.Right; i++)
             {
                 for (int j = nRect.Top; j <= nRect.Bottom; j++)
