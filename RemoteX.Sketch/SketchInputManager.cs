@@ -61,11 +61,11 @@ namespace RemoteX.Sketch
             InputManager = inputManager;
         }
 
-        public SketchPointer[] SketchPointers
+        public IReadOnlyList<SketchPointer> SketchPointers
         {
             get
             {
-                return SketchPointersList.ToArray();
+                return SketchPointersList;
             }
         }
 
@@ -135,7 +135,13 @@ namespace RemoteX.Sketch
         }
 
         public SketchInputManager SketchInputManager { get; }
-
+        public PointerState State
+        {
+            get
+            {
+                return Pointer.LatestState;
+            }
+        }
 
         public SketchPointer(SketchInputManager sketchInputManager, IPointer pointer)
         {

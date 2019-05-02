@@ -19,14 +19,8 @@ namespace RemoteX.Input.Win10
 
         public PointerState LatestState { get; set; }
 
-        public Vector2 PointerPoint
-        {
-            get
-            {
-                Windows.Foundation.Point win10Point = Win10PointerPoint.Position;
-                return new Vector2((float)win10Point.X, (float)win10Point.Y);
-            }
-        }
+        private object readPointLock = new object();
+        public Vector2 PointerPoint { get; private set; }
 
         public Windows.UI.Input.PointerPoint Win10PointerPoint { get; set; }
         public IInputManager InputManager { get; set; }
@@ -42,6 +36,7 @@ namespace RemoteX.Input.Win10
         {
             Win10PointerPoint = win10PointerPoint;
             LatestState = latestState;
+            PointerPoint = new Vector2((float)Win10PointerPoint.Position.X, (float)Win10PointerPoint.Position.Y);
         }
 
         public override string ToString()

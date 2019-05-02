@@ -1,6 +1,7 @@
 ﻿
 using RemoteX.Input.Win10;
 using RemoteX.Sketch.CoreModule;
+using RemoteX.Sketch.InputComponent;
 using RemoteX.Sketch.Skia;
 using SkiaSharp;
 using System;
@@ -12,6 +13,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Graphics.Display;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -44,16 +46,23 @@ namespace RemoteX.Sketch.UwpExample
             Sketch.SketchEngine.Instantiate<ExampleSketchObject>();
             Sketch.SketchEngine.Instantiate<GridRenderer>();
             Sketch.SketchEngine.Instantiate<PointerInfoBoard>();
+            
             sketchInputManager = Sketch.SketchEngine.Instantiate<SketchInputManager>();
             sketchInputManager.Init(inputManager);
+            var joystick = Sketch.SketchEngine.Instantiate<ColorJoystick>();
+            joystick.RectTransform.AnchorMax = new Vector2(1, 1);
+            joystick.RectTransform.AnchorMin = new Vector2(0, 0);
+            joystick.RectTransform.OffsetMax = new Vector2(-100, -100);
+            joystick.RectTransform.OffsetMin = new Vector2(100, 100);
             //InputLayerRect.TransformMatrix;
             Matrix3x2 matrix = Matrix3x2.CreateScale(0.2f, -0.2f);
 
             sketchInputManager.InputSpaceToSketchSpaceMatrix = matrix;
-            
 
             Sketch.SkiaManager.BeforePaint += SkiaManager_BeforePaint;
+
             
+
         }
 
         private void SkiaManager_BeforePaint(object sender, SKCanvas e)
@@ -64,9 +73,12 @@ namespace RemoteX.Sketch.UwpExample
             matrix.SetScaleTranslate(0.2f, -0.2f, e.LocalClipBounds.Width / 2, e.LocalClipBounds.Height/2);
             skiaManager.SketchSpaceToCanvasSpaceMatrix = matrix;
 
-            Matrix3x2 mat = Matrix3x2.Multiply(Matrix3x2.CreateTranslation(-e.LocalClipBounds.Width / 2, -e.LocalClipBounds.Height / 2), Matrix3x2.CreateScale(1/0.2f, -1/0.2f));
-
-            sketchInputManager.InputSpaceToSketchSpaceMatrix = mat;
+            
+            float baseDpi = 96;
+            Matrix3x2 epxToPx = Matrix3x2.CreateScale(DisplayInformation.GetForCurrentView().LogicalDpi / baseDpi);
+            Matrix3x2 pxToSketchSpace = Matrix3x2.Multiply(Matrix3x2.CreateTranslation(-e.LocalClipBounds.Width / 2, -e.LocalClipBounds.Height / 2), Matrix3x2.CreateScale(1 / 0.2f, -1 / 0.2f));
+            sketchInputManager.InputSpaceToSketchSpaceMatrix = Matrix3x2.Multiply(epxToPx, pxToSketchSpace);
+            //System.Diagnostics.Debug.WriteLine(DisplayInformation.GetForCurrentView().);
 
         }
 

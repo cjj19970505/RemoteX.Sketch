@@ -2,6 +2,7 @@
 using RemoteX.Sketch.Skia;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -12,28 +13,39 @@ namespace RemoteX.Sketch
     {
         public SketchEngine SketchEngine { get; }
         public SkiaManager SkiaManager { get; }
+        public SketchInfo SketchInfo { get; }
         public Task RunSketchTask;
         public Timer UpdateTimer { get; }
         public float DesiredFrameRate { get; set; }
         public float Width { get; set; }
         public float Height { get; set; }
 
-        
-        
+        public Matrix3x2 SketchToSketchNormalizedMatrix
+        {
+            get
+            {
+                return Matrix3x2.CreateScale(1 / Width, 1 / Height);
+            }
+        }
+
+
         public Sketch()
         {
             SketchEngine = new SketchEngine();
-            DesiredFrameRate = 120;
+            DesiredFrameRate = 60;
             UpdateTimer = new Timer();
             UpdateTimer.Elapsed += UpdateTimer_Elapsed;
             UpdateTimer.Interval = 1 / DesiredFrameRate * 1000;
             SkiaManager = SketchEngine.Instantiate<SkiaManager>();
-
-
+            SketchInfo = SketchEngine.Instantiate<SketchInfo>();
+            SketchInfo.Init(this);
+            Width = 1000;
+            Height = 1000;
         }
         
         public void Start()
         {
+            SketchEngine.Update(0);
             RunSketchTask = _UpdataTask();
         }
 
@@ -63,6 +75,13 @@ namespace RemoteX.Sketch
             return task;
         }
 
-
+    }
+    public class SketchInfo : SketchObject
+    {
+        public Sketch Sketch { get; private set; }
+        public void Init(Sketch sketch)
+        {
+            Sketch = sketch;
+        }
     }
 }

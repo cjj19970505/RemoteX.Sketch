@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RemoteX.Input\RemoteX.Input.csproj" />
     <ProjectReference Include="..\RemoteX.Sketch.CoreModule\RemoteX.Sketch.CoreModule.csproj" />
     <ProjectReference Include="..\RemoteX.Sketch.Skia\RemoteX.Sketch.Skia.csproj" />

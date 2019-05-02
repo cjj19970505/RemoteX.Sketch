@@ -53,7 +53,7 @@ namespace RemoteX.Sketch.CoreModule
             T skiaObject = new T();
             skiaObject.SketchEngine = this;
             _ReadyToInstantiateSketchObjectList.Add(skiaObject);
-            
+            skiaObject.OnInstantiated();
             return skiaObject;
         }
 
@@ -75,7 +75,7 @@ namespace RemoteX.Sketch.CoreModule
                 {
                     _SketchObjectList.Add(sketchObject);
                     sketchObject.IsInstantiated = true;
-                    sketchObject.OnInstantiated();
+                    //sketchObject.OnInstantiated();
                 }
                 _ReadyToInstantiateSketchObjectList.Clear();
                 foreach (var sketchObject in _SketchObjectList)
