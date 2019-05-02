@@ -23,7 +23,7 @@ namespace RemoteX.Sketch
         public Sketch()
         {
             SketchEngine = new SketchEngine();
-            DesiredFrameRate = 60;
+            DesiredFrameRate = 120;
             UpdateTimer = new Timer();
             UpdateTimer.Elapsed += UpdateTimer_Elapsed;
             UpdateTimer.Interval = 1 / DesiredFrameRate * 1000;

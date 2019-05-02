@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RemoteX.Sketch
+namespace RemoteX.GraphicMath
 {
-    public class SketchSystem
+    static class GMUtility
     {
         
     }

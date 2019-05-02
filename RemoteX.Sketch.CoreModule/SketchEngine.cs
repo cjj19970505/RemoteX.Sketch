@@ -23,6 +23,18 @@ namespace RemoteX.Sketch.CoreModule
             }
         }
 
+        public T FindObjectByType<T>() where T:SketchObject
+        {
+            foreach(var sketchObject in _SketchObjectList)
+            {
+                if(sketchObject is T)
+                {
+                    return sketchObject as T;
+                }
+            }
+            return null;
+        }
+
         public SketchEngine()
         {
             _SketchObjectList = new List<SketchObject>();

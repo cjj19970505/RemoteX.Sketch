@@ -15,6 +15,7 @@ namespace RemoteX.Sketch.Skia
         /// </summary>
         public Action InvalidateView { get; set; }
         public SKMatrix SketchSpaceToCanvasSpaceMatrix { get; set; }
+        
 
         /// <summary>
         /// Used to adjust the AppToSketch argument such as SpaceMatrixs

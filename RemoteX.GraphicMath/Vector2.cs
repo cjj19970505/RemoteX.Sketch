@@ -25,6 +25,11 @@ namespace RemoteX.GraphicMath
                 return new Vector2(0, 0);
             }
         }
+
+        public static float Dot(Vector2 lhs, Vector2 rhs)
+        {
+            return lhs.x * rhs.x + lhs.y * rhs.y + lhs.x * rhs.y;
+        }
         public static Vector2 operator +(Vector2 lhs, Vector2 rhs)
         {
             return new Vector2(lhs.x + rhs.x, lhs.y + rhs.y);
@@ -41,6 +46,8 @@ namespace RemoteX.GraphicMath
         {
             return new Vector2(lhs * rhs.x, lhs * rhs.y);
         }
+
+        
         public static bool operator ==(Vector2 lhs, Vector2 rhs)
         {
             return (lhs.x == rhs.x) && (lhs.y == rhs.y);
@@ -49,11 +56,19 @@ namespace RemoteX.GraphicMath
         {
             return (lhs.x != rhs.x) || (lhs.y != rhs.y);
         }
+
+        public static implicit operator Vector3(Vector2 self)
+        {
+            return new Vector3(self.x, self.y, 0);
+        }
         public override string ToString()
         {
             return "(" + x + ", " + y + ")";
         }
     }
+
+    
+
 
     
 }

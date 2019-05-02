@@ -1,4 +1,5 @@
-﻿using RemoteX.Input.Win10;
+﻿
+using RemoteX.Input.Win10;
 using RemoteX.Sketch.CoreModule;
 using RemoteX.Sketch.Skia;
 using SkiaSharp;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using Windows.Foundation;
@@ -29,48 +31,29 @@ namespace RemoteX.Sketch.UwpExample
     public sealed partial class MainPage : Page
     {
         public Sketch Sketch { get; }
-
+        SketchInputManager sketchInputManager;
         public MainPage()
         {
             this.InitializeComponent();
+            InputManager inputManager = new InputManager(InputLayerRect);
+
             Sketch = new Sketch();
             Sketch.SkiaManager.Init(SKCanvasView.Invalidate, SKMatrix.MakeScale(1, -1));
             System.Diagnostics.Debug.WriteLine("MainPageThread:" + Thread.CurrentThread.ManagedThreadId);
             Sketch.Start();
             Sketch.SketchEngine.Instantiate<ExampleSketchObject>();
             Sketch.SketchEngine.Instantiate<GridRenderer>();
+            Sketch.SketchEngine.Instantiate<PointerInfoBoard>();
+            sketchInputManager = Sketch.SketchEngine.Instantiate<SketchInputManager>();
+            sketchInputManager.Init(inputManager);
+            //InputLayerRect.TransformMatrix;
+            Matrix3x2 matrix = Matrix3x2.CreateScale(0.2f, -0.2f);
+
+            sketchInputManager.InputSpaceToSketchSpaceMatrix = matrix;
+            
+
             Sketch.SkiaManager.BeforePaint += SkiaManager_BeforePaint;
-            InputManager inputManager = new InputManager(InputLayerRect);
-            inputManager.PointerEntered += InputManager_PointerEntered;
-            inputManager.PointerMoved += InputManager_PointerMoved;
-            inputManager.PointerPressed += InputManager_PointerPressed;
-            inputManager.PointerReleased += InputManager_PointerReleased;
-            inputManager.PointerExited += InputManager_PointerExited;
-        }
-
-        private void InputManager_PointerExited(object sender, Input.IPointer e)
-        {
-            System.Diagnostics.Debug.WriteLine("EXIT:" + e);
-        }
-
-        private void InputManager_PointerReleased(object sender, Input.IPointer e)
-        {
-            System.Diagnostics.Debug.WriteLine("RELEASE:" + e);
-        }
-
-        private void InputManager_PointerPressed(object sender, Input.IPointer e)
-        {
-            System.Diagnostics.Debug.WriteLine("PRESSED:" + e);
-        }
-
-        private void InputManager_PointerMoved(object sender, Input.IPointer e)
-        {
-            System.Diagnostics.Debug.WriteLine("MOVE:"+e);
-        }
-
-        private void InputManager_PointerEntered(object sender, Input.IPointer e)
-        {
-            System.Diagnostics.Debug.WriteLine("ENTER:" + e);
+            
         }
 
         private void SkiaManager_BeforePaint(object sender, SKCanvas e)
@@ -78,8 +61,13 @@ namespace RemoteX.Sketch.UwpExample
             var skiaManager = sender as SkiaManager;
             SKMatrix.MakeTranslation(0, e.LocalClipBounds.Height);
             var matrix = skiaManager.SketchSpaceToCanvasSpaceMatrix;
-            matrix.SetScaleTranslate(1f, 1f, e.LocalClipBounds.Width / 2, e.LocalClipBounds.Height/2);
+            matrix.SetScaleTranslate(0.2f, -0.2f, e.LocalClipBounds.Width / 2, e.LocalClipBounds.Height/2);
             skiaManager.SketchSpaceToCanvasSpaceMatrix = matrix;
+
+            Matrix3x2 mat = Matrix3x2.Multiply(Matrix3x2.CreateTranslation(-e.LocalClipBounds.Width / 2, -e.LocalClipBounds.Height / 2), Matrix3x2.CreateScale(1/0.2f, -1/0.2f));
+
+            sketchInputManager.InputSpaceToSketchSpaceMatrix = mat;
+
         }
 
         private void SKCanvasView_PaintSurface(object sender, SkiaSharp.Views.UWP.SKPaintSurfaceEventArgs e)

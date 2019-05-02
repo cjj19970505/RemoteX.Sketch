@@ -132,10 +132,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RemoteX.GraphicMath\RemoteX.GraphicMath.csproj">
-      <Project>{2daa0f66-1ed2-412d-819a-4066e3bcffe0}</Project>
-      <Name>RemoteX.GraphicMath</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RemoteX.Input\RemoteX.Input.csproj">
       <Project>{c4749ee7-d00e-4a95-b40e-9994836fcb34}</Project>
       <Name>RemoteX.Input</Name>

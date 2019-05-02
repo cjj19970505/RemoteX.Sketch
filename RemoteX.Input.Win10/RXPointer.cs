@@ -1,9 +1,9 @@
-﻿using RemoteX.GraphicMath;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Numerics;
 
 namespace RemoteX.Input.Win10
 {
@@ -29,7 +29,7 @@ namespace RemoteX.Input.Win10
         }
 
         public Windows.UI.Input.PointerPoint Win10PointerPoint { get; set; }
-        public InputManager InputManager { get; set; }
+        public IInputManager InputManager { get; set; }
 
         
 

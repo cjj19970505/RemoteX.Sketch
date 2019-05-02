@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RemoteX.Input\RemoteX.Input.csproj" />
     <ProjectReference Include="..\RemoteX.Sketch.CoreModule\RemoteX.Sketch.CoreModule.csproj" />
     <ProjectReference Include="..\RemoteX.Sketch.Skia\RemoteX.Sketch.Skia.csproj" />
   </ItemGroup>

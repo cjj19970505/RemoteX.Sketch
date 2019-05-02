@@ -19,6 +19,8 @@ namespace RemoteX.Input.Win10
         /// </summary>
         public Dictionary<uint, IPointer> PointerDict;
 
+        private object PointerDictLock;
+
         public event EventHandler<IPointer> PointerEntered;
         public event EventHandler<IPointer> PointerPressed;
         public event EventHandler<IPointer> PointerMoved;
@@ -27,6 +29,7 @@ namespace RemoteX.Input.Win10
 
         public InputManager(UIElement pointerDetectUIElement)
         {
+            PointerDictLock = new object();
             PointerDict = new Dictionary<uint, IPointer>();
             PointerDetectUIElement = pointerDetectUIElement;
             pointerDetectUIElement.PointerCanceled += PointerDetectUIElement_PointerCanceled;
@@ -41,70 +44,100 @@ namespace RemoteX.Input.Win10
 
         private void PointerDetectUIElement_PointerWheelChanged(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
-
+            
         }
 
         private void PointerDetectUIElement_PointerReleased(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             PointerPoint win10PointerPoint = e.GetCurrentPoint(PointerDetectUIElement);
-            if(PointerDict.ContainsKey(win10PointerPoint.PointerId))
+            lock (PointerDictLock)
             {
-                RXPointer pointer = PointerDict[win10PointerPoint.PointerId] as RXPointer;
-                pointer.UpdatePointer(win10PointerPoint, PointerState.Released);
-                PointerReleased?.Invoke(this, pointer);
+                if (PointerDict.ContainsKey(win10PointerPoint.PointerId))
+                {
+                    RXPointer pointer = PointerDict[win10PointerPoint.PointerId] as RXPointer;
+                    pointer.UpdatePointer(win10PointerPoint, PointerState.Released);
+                    PointerReleased?.Invoke(this, pointer);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
-            else
-            {
-                throw new NotImplementedException();
-            }
+                
         }
 
         private void PointerDetectUIElement_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             PointerPoint win10PointerPoint = e.GetCurrentPoint(PointerDetectUIElement);
-            if (PointerDict.ContainsKey(win10PointerPoint.PointerId))
+            lock(PointerDictLock)
             {
-                RXPointer pointer = PointerDict[win10PointerPoint.PointerId] as RXPointer;
-                pointer.UpdatePointer(win10PointerPoint, PointerState.Pressed);
-                PointerPressed?.Invoke(this, pointer);
+                if (PointerDict.ContainsKey(win10PointerPoint.PointerId))
+                {
+                    RXPointer pointer = PointerDict[win10PointerPoint.PointerId] as RXPointer;
+                    pointer.UpdatePointer(win10PointerPoint, PointerState.Pressed);
+                    PointerPressed?.Invoke(this, pointer);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
-            else
-            {
-                throw new NotImplementedException();
-            }
+            
         }
 
         private void PointerDetectUIElement_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
+            PointerPoint win10PointerPoint = e.GetCurrentPoint(PointerDetectUIElement);
+            lock(PointerDictLock)
+            {
+                if (PointerDict.ContainsKey(win10PointerPoint.PointerId))
+                {
+                    RXPointer pointer = PointerDict[win10PointerPoint.PointerId] as RXPointer;
+                    pointer.UpdatePointer(win10PointerPoint, pointer.LatestState);
+                    PointerMoved?.Invoke(this, pointer);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            
         }
 
         private void PointerDetectUIElement_PointerExited(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             PointerPoint win10PointerPoint = e.GetCurrentPoint(PointerDetectUIElement);
-            if(PointerDict.ContainsKey(win10PointerPoint.PointerId))
+            lock(PointerDict)
             {
-                RXPointer pointer = PointerDict[win10PointerPoint.PointerId] as RXPointer;
-                pointer.UpdatePointer(win10PointerPoint, PointerState.Exited);
-                PointerDict.Remove(win10PointerPoint.PointerId);
-                PointerExited?.Invoke(this, pointer);
+                if (PointerDict.ContainsKey(win10PointerPoint.PointerId))
+                {
+                    RXPointer pointer = PointerDict[win10PointerPoint.PointerId] as RXPointer;
+                    pointer.UpdatePointer(win10PointerPoint, PointerState.Exited);
+                    PointerDict.Remove(win10PointerPoint.PointerId);
+                    PointerExited?.Invoke(this, pointer);
+                }
             }
+            
         }
 
         private void PointerDetectUIElement_PointerEntered(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             PointerPoint win10PointerPoint = e.GetCurrentPoint(PointerDetectUIElement);
-
-            if(PointerDict.ContainsKey(win10PointerPoint.PointerId))
+            lock(PointerDict)
             {
-                throw new NotImplementedException();
+                if (PointerDict.ContainsKey(win10PointerPoint.PointerId))
+                {
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    RXPointer pointer = new RXPointer(this);
+                    pointer.UpdatePointer(win10PointerPoint, PointerState.Entered);
+                    PointerDict.Add(pointer.Win10PointerPoint.PointerId, pointer);
+                    PointerEntered?.Invoke(this, pointer);
+                }
             }
-            else
-            {
-                RXPointer pointer = new RXPointer(this);
-                pointer.UpdatePointer(win10PointerPoint, PointerState.Entered);
-                PointerDict.Add(pointer.Win10PointerPoint.PointerId, pointer);
-                PointerEntered?.Invoke(this, pointer);
-            }
+            
         }
 
         private void PointerDetectUIElement_PointerCaptureLost(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)

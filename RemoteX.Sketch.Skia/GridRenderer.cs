@@ -10,7 +10,7 @@ namespace RemoteX.Sketch.Skia
     {
         //public float IntervalX { get; set; }
         //public float IntervalY { get; set; }
-        public float Base = 100;
+        public float Base = 10;
         readonly SKPaint _TextPaint = new SKPaint
         {
             TextSize = 20,

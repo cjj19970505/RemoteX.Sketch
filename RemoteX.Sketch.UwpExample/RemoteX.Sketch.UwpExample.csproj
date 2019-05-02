@@ -159,10 +159,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RemoteX.GraphicMath\RemoteX.GraphicMath.csproj">
-      <Project>{2daa0f66-1ed2-412d-819a-4066e3bcffe0}</Project>
-      <Name>RemoteX.GraphicMath</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RemoteX.Input.Win10\RemoteX.Input.Win10.csproj">
       <Project>{b8947e48-e69c-4f72-a7e8-06641a7e4f69}</Project>
       <Name>RemoteX.Input.Win10</Name>
