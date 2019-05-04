@@ -54,7 +54,7 @@ namespace RemoteX.Sketch.Skia
                 Color = SKColors.White
             };
             paint.TextSize = 20;
-            canvas.Clear();
+            canvas.Clear(SKColors.Black);
 
             BeforePaint?.Invoke(this, canvas);
 
