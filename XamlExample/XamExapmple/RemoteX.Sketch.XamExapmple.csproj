@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\RemoteX.Input\RemoteX.Input.csproj" />
     <ProjectReference Include="..\..\RemoteX.Sketch\RemoteX.Sketch.csproj" />
   </ItemGroup>
 </Project>

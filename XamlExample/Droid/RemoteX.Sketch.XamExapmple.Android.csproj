@@ -99,6 +99,14 @@
     <Folder Include="Resources\drawable\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\RemoteX.Input.Droid\RemoteX.Input.Droid.csproj">
+      <Project>{193248c6-b6d4-4a66-bbc6-815957043d76}</Project>
+      <Name>RemoteX.Input.Droid</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\RemoteX.Input\RemoteX.Input.csproj">
+      <Project>{c4749ee7-d00e-4a95-b40e-9994836fcb34}</Project>
+      <Name>RemoteX.Input</Name>
+    </ProjectReference>
     <ProjectReference Include="..\XamExapmple\RemoteX.Sketch.XamExapmple.csproj">
       <Project>{88e2d283-abe3-45b7-b64b-0fca44cc18d8}</Project>
       <Name>RemoteX.Sketch.XamExapmple</Name>

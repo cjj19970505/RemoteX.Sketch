@@ -61,11 +61,11 @@ namespace RemoteX.Sketch
             InputManager = inputManager;
         }
 
-        public IReadOnlyList<SketchPointer> SketchPointers
+        public SketchPointer[] SketchPointers
         {
             get
             {
-                return SketchPointersList;
+                return SketchPointersList.ToArray();
             }
         }
 
