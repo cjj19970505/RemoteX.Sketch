@@ -1,4 +1,5 @@
 ﻿using RemoteX.Input.Win10;
+using RemoteX.Sketch.Editor.ComponentBuilder;
 using RemoteX.Sketch.InputComponent;
 using RemoteX.Sketch.Skia;
 using SkiaSharp;
@@ -55,6 +56,12 @@ namespace RemoteX.Sketch.Editor
             joystick.RectTransform.OffsetMax = new Vector2(-100, -100);
             joystick.RectTransform.OffsetMin = new Vector2(100, 100);
             joystick.Level = 1;
+
+            var inputComponentBuilder = Sketch.SketchEngine.Instantiate<InputComponentBuilder>();
+            inputComponentBuilder.RectTransform.AnchorMax = new Vector2(1, 1);
+            inputComponentBuilder.RectTransform.AnchorMin = new Vector2(0, 0);
+            inputComponentBuilder.RectTransform.OffsetMax = new Vector2(-100, -100);
+            inputComponentBuilder.RectTransform.OffsetMin = new Vector2(100, 100);
 
             var joystick2 = Sketch.SketchEngine.Instantiate<ColorJoystick>();
             joystick2.RectTransform.AnchorMax = new Vector2(0, 0);

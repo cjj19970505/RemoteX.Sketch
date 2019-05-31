@@ -8,7 +8,7 @@ using System.Text;
 
 namespace RemoteX.Sketch.InputComponent
 {
-    class ComponentSelector : SketchObject, IInputComponent, ISkiaRenderer
+    class ComponentSelector : SketchObject, ISkiaRenderer
     {
         protected SketchPointer OnSketchPointer { get; private set; }
         public Vector2 Delta { get; private set; }
@@ -71,6 +71,7 @@ namespace RemoteX.Sketch.InputComponent
         {
             if(Pressed)
             {
+                
                 SKPoint p1 = skiaManager.SketchSpaceToCanvasSpaceMatrix.MapPoint(_StartPos.ToSKPoint());
                 SKPoint p2 = skiaManager.SketchSpaceToCanvasSpaceMatrix.MapPoint((_StartPos + Delta).ToSKPoint());
                 SKPoint pMin = new SKPoint();

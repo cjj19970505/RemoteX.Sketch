@@ -121,6 +121,7 @@
     <Compile Include="ComponentBuilder\InputComponentBuilder.cs" />
     <Compile Include="ComponentBuilder\JoystickBuilder.cs" />
     <Compile Include="ComponentBuilder\ComponentSelector.cs" />
+    <Compile Include="EditorManager.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
