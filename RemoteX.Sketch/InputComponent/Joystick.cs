@@ -9,7 +9,7 @@ namespace RemoteX.Sketch.InputComponent
     public abstract class Joystick : SketchObject, IInputComponent
     {
         public int Level { get; set; }
-        protected virtual IArea StartRegion { get; }
+        public virtual IArea StartRegion { get; }
         protected SketchPointer OnSketchPointer { get; private set; }
 
         public Vector2 Delta { get; private set; }
@@ -47,7 +47,7 @@ namespace RemoteX.Sketch.InputComponent
             {
                 foreach (var sketchPointer in sketchInputManager.SketchPointers)
                 {
-                    if (StartRegion.IsOverlapPoint(sketchPointer.Point))
+                    if (StartRegion.IsOverlapPoint(sketchPointer.Point) && sketchPointer.HitLayer == Level)
                     {
                         if(sketchPointer.State == Input.PointerState.Pressed)
                         {

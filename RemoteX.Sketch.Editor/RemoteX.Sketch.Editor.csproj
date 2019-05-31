@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{7EB62ADC-272F-4702-B99D-9E42DA9D6446}</ProjectGuid>
+    <ProjectGuid>{77402577-B0D1-49CD-A5AB-6337CAD69D65}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RemoteX.Sketch.UwpExample</RootNamespace>
-    <AssemblyName>RemoteX.Sketch.UwpExample</AssemblyName>
+    <RootNamespace>RemoteX.Sketch.Editor</RootNamespace>
+    <AssemblyName>RemoteX.Sketch.Editor</AssemblyName>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.17763.0</TargetPlatformVersion>
@@ -17,7 +17,6 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
-    <PackageCertificateKeyFile>RemoteX.Sketch.UwpExample_TemporaryKey.pfx</PackageCertificateKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -119,16 +118,21 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ComponentBuilder\InputComponentBuilder.cs" />
+    <Compile Include="ComponentBuilder\JoystickBuilder.cs" />
+    <Compile Include="ComponentBuilder\ComponentSelector.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SketchDesignPage.xaml.cs">
+      <DependentUpon>SketchDesignPage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="RemoteX.Sketch.UwpExample_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\Default.rd.xml" />
@@ -148,6 +152,10 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SketchDesignPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -175,7 +183,7 @@
       <Name>RemoteX.Sketch.CoreModule</Name>
     </ProjectReference>
     <ProjectReference Include="..\RemoteX.Sketch.Skia\RemoteX.Sketch.Skia.csproj">
-      <Project>{578C262E-47FF-4311-BF9B-03F796E1574A}</Project>
+      <Project>{578c262e-47ff-4311-bf9b-03f796e1574a}</Project>
       <Name>RemoteX.Sketch.Skia</Name>
     </ProjectReference>
     <ProjectReference Include="..\RemoteX.Sketch\RemoteX.Sketch.csproj">
@@ -183,6 +191,7 @@
       <Name>RemoteX.Sketch</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

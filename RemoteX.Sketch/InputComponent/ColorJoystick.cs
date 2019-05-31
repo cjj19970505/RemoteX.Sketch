@@ -9,7 +9,7 @@ namespace RemoteX.Sketch.InputComponent
 {
     public class ColorJoystick : Joystick, ISkiaRenderer
     {
-        protected override IArea StartRegion
+        public override IArea StartRegion
         {
             get
             {

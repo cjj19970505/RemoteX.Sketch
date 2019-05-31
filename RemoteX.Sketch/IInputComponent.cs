@@ -4,9 +4,9 @@ using System.Text;
 
 namespace RemoteX.Sketch
 {
-    interface IInputComponent
+    public interface IInputComponent
     {
         int Level { get; }
-
+        IArea StartRegion { get; }
     }
 }

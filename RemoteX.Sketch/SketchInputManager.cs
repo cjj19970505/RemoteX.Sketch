@@ -45,12 +45,20 @@ namespace RemoteX.Sketch
                 {
                     InputManager.PointerEntered -= InputManager_PointerEntered;
                     InputManager.PointerExited -= InputManager_PointerExited;
+                    InputManager.PointerPressed -= InputManager_PointerPressed;
+                    
+
                 }
                 _InputManager = value;
                 InputManager.PointerEntered += InputManager_PointerEntered;
                 InputManager.PointerExited += InputManager_PointerExited;
+                InputManager.PointerPressed += InputManager_PointerPressed;
+                InputManager.PointerReleased += InputManager_PointerReleased;
             }
         }
+
+        
+
         protected override void OnInstantiated()
         {
             base.OnInstantiated();
@@ -89,6 +97,61 @@ namespace RemoteX.Sketch
             }
         }
 
+        private void InputManager_PointerReleased(object sender, IPointer e)
+        {
+            lock (_SketchPointersReadyToExitLock)
+            {
+                SketchPointer sketchPointer = SketchPointersList.Find((obj) =>
+                {
+                    if (obj.Pointer == e)
+                    {
+                        return true;
+                    }
+                    return false;
+                });
+
+                if (sketchPointer != null)
+                {
+                    sketchPointer.HitLayer = -1;
+                }
+            }
+        }
+
+        private void InputManager_PointerPressed(object sender, IPointer e)
+        {
+            lock (_SketchPointersReadyToExitLock)
+            {
+                SketchPointer sketchPointer = SketchPointersList.Find((obj) =>
+                {
+                    if (obj.Pointer == e)
+                    {
+                        return true;
+                    }
+                    return false;
+                });
+
+                if(sketchPointer != null)
+                {
+                    //throw new NotImplementedException("Do Remember implement Hit test and get layer");
+                    foreach(var sketchObject in SketchEngine.SketchObjectList)
+                    {
+                        if(sketchObject is IInputComponent)
+                        {
+                            if((sketchObject as IInputComponent).StartRegion.IsOverlapPoint(sketchPointer.Point))
+                            {
+                                sketchPointer.HitLayer = (sketchObject as IInputComponent).Level;
+                                break;
+                            }
+                        }
+                    }
+                    if(sketchPointer.HitLayer < 0)
+                    {
+                        sketchPointer.HitLayer = 0;
+                    }
+                }
+            }
+        }
+
         private void InputManager_PointerExited(object sender, IPointer e)
         {
             lock(_SketchPointersReadyToExitLock)
@@ -123,6 +186,13 @@ namespace RemoteX.Sketch
     public class SketchPointer
     {
         public IPointer Pointer { get; private set; }
+
+        /// <summary>
+        /// -1 Not pressed
+        /// 0: Pressed but hit nothing
+        /// >0: 
+        /// </summary>
+        public int HitLayer { get; internal set; }
         
         public Vector2 Point
         {
@@ -151,7 +221,7 @@ namespace RemoteX.Sketch
 
         public override string ToString()
         {
-            return "[" + Pointer.PointerDeviceType + "|" + Point + "]";
+            return "[" + Pointer.PointerDeviceType + "|" + Point + "|"+HitLayer+"]";
         }
 
 

@@ -14,6 +14,7 @@ namespace RemoteX.Sketch.CoreModule
 
         private readonly List<SketchObject> _SketchObjectList;
         private readonly List<SketchObject> _ReadyToInstantiateSketchObjectList;
+        
 
         public IReadOnlyList<SketchObject> SketchObjectList
         {
@@ -33,6 +34,19 @@ namespace RemoteX.Sketch.CoreModule
                 }
             }
             return null;
+        }
+
+        public T[] FindObjectsByType<T>() where T:SketchObject
+        {
+            List<T> sketchObjectsOfType = new List<T>();
+            foreach(var sketchObject in _SketchObjectList)
+            {
+                if(sketchObject is T)
+                {
+                    sketchObjectsOfType.Add(sketchObject as T);
+                }
+            }
+            return sketchObjectsOfType.ToArray();
         }
 
         public SketchEngine()

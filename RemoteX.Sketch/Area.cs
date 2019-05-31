@@ -23,4 +23,12 @@ namespace RemoteX.Sketch
             return false;
         }
     }
+
+    public struct AllArea : IArea
+    {
+        public bool IsOverlapPoint(Vector2 point)
+        {
+            return true;
+        }
+    }
 }

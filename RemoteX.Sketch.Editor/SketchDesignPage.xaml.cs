@@ -1,6 +1,4 @@
-﻿
-using RemoteX.Input.Win10;
-using RemoteX.Sketch.CoreModule;
+﻿using RemoteX.Input.Win10;
 using RemoteX.Sketch.InputComponent;
 using RemoteX.Sketch.Skia;
 using SkiaSharp;
@@ -14,7 +12,6 @@ using System.Threading;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
-using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -23,18 +20,18 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
+// https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
-namespace RemoteX.Sketch.UwpExample
+namespace RemoteX.Sketch.Editor
 {
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class SketchDesignPage : Page
     {
         public Sketch Sketch { get; }
         SketchInputManager sketchInputManager;
-        public MainPage()
+        public SketchDesignPage()
         {
             this.InitializeComponent();
             InputManager inputManager = new InputManager(InputLayerRect);
@@ -47,6 +44,7 @@ namespace RemoteX.Sketch.UwpExample
             Sketch.SketchEngine.Instantiate<GridRenderer>();
             Sketch.SketchEngine.Instantiate<PointerInfoBoard>();
             Sketch.SketchEngine.Instantiate<SketchBorderRenderer>();
+            Sketch.SketchEngine.Instantiate<ComponentSelector>();
 
 
             sketchInputManager = Sketch.SketchEngine.Instantiate<SketchInputManager>();
@@ -71,8 +69,6 @@ namespace RemoteX.Sketch.UwpExample
 
             Sketch.SkiaManager.BeforePaint += SkiaManager_BeforePaint;
 
-            
-
         }
 
         private void SkiaManager_BeforePaint(object sender, SKCanvas e)
@@ -80,10 +76,10 @@ namespace RemoteX.Sketch.UwpExample
             var skiaManager = sender as SkiaManager;
             SKMatrix.MakeTranslation(0, e.LocalClipBounds.Height);
             var matrix = skiaManager.SketchSpaceToCanvasSpaceMatrix;
-            matrix.SetScaleTranslate(0.2f, -0.2f, e.LocalClipBounds.Width / 2, e.LocalClipBounds.Height/2);
+            matrix.SetScaleTranslate(0.2f, -0.2f, e.LocalClipBounds.Width / 2, e.LocalClipBounds.Height / 2);
             skiaManager.SketchSpaceToCanvasSpaceMatrix = matrix;
 
-            
+
             float baseDpi = 96;
             Matrix3x2 epxToPx = Matrix3x2.CreateScale(DisplayInformation.GetForCurrentView().LogicalDpi / baseDpi);
             Matrix3x2 pxToSketchSpace = Matrix3x2.Multiply(Matrix3x2.CreateTranslation(-e.LocalClipBounds.Width / 2, -e.LocalClipBounds.Height / 2), Matrix3x2.CreateScale(1 / 0.2f, -1 / 0.2f));
@@ -103,7 +99,7 @@ namespace RemoteX.Sketch.UwpExample
                 TextSize = 24
             };
             Sketch.SkiaManager.OnPaintSurface(e.Surface.Canvas);
-            
+
         }
     }
 }
