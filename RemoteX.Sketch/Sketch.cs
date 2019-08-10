@@ -20,6 +20,10 @@ namespace RemoteX.Sketch
         public float Width { get; set; }
         public float Height { get; set; }
 
+        /// <summary>
+        /// 当在进行Update时这个锁会锁住，若害怕自己的异步操作会有不良影响的话注意锁住
+        /// </summary>
+        public object UpdateTheadLock { get; }
         public Matrix3x2 SketchToSketchNormalizedMatrix
         {
             get
@@ -32,6 +36,7 @@ namespace RemoteX.Sketch
         public Sketch()
         {
             SketchEngine = new SketchEngine();
+            UpdateTheadLock = new object();
             DesiredFrameRate = 60;
             UpdateTimer = new Timer();
             UpdateTimer.Elapsed += UpdateTimer_Elapsed;
@@ -63,7 +68,10 @@ namespace RemoteX.Sketch
                 while (true)
                 {
                     DateTime startUpdateDateTime = DateTime.Now;
-                    SketchEngine.Update((float)frameTimer.TotalSeconds);
+                    lock(UpdateTheadLock)
+                    {
+                        SketchEngine.Update((float)frameTimer.TotalSeconds);
+                    }
                     var updateTimeSpan = DateTime.Now - startUpdateDateTime;
                     var sleepTimespan = frameRateTimeSpan - updateTimeSpan;
                     if(sleepTimespan > TimeSpan.FromMilliseconds(0))
