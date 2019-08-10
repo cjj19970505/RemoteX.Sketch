@@ -62,14 +62,15 @@ namespace RemoteX.Sketch
                 TimeSpan frameRateTimeSpan = new TimeSpan(0, 0, 0, 0, (int)(1 / DesiredFrameRate * 1000));
                 while (true)
                 {
-                    DateTime currDateTime = DateTime.Now;
-                    frameTimer += (currDateTime - lastFrameDateTime);
-                    lastFrameDateTime = currDateTime;
-                    if (frameTimer >= frameRateTimeSpan)
+                    DateTime startUpdateDateTime = DateTime.Now;
+                    SketchEngine.Update((float)frameTimer.TotalSeconds);
+                    var updateTimeSpan = DateTime.Now - startUpdateDateTime;
+                    var sleepTimespan = frameRateTimeSpan - updateTimeSpan;
+                    if(sleepTimespan > TimeSpan.FromMilliseconds(0))
                     {
-                        SketchEngine.Update((float)frameTimer.TotalSeconds);
-                        frameTimer = TimeSpan.Zero;
+                        System.Threading.Thread.Sleep((int)sleepTimespan.TotalMilliseconds);
                     }
+                    
                 }
             });
             return task;

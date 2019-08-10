@@ -8,6 +8,9 @@ using System.Text;
 
 namespace RemoteX.Sketch
 {
+    /// <summary>
+    /// Update all input into update thread
+    /// </summary>
     public class SketchInputManager : SketchObject
     {
         public Matrix3x2 InputSpaceToSketchSpaceMatrix { get; set; }
