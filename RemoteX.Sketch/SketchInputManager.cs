@@ -13,29 +13,20 @@ namespace RemoteX.Sketch
     /// </summary>
     public class SketchInputManager : SketchObject
     {
+        public event EventHandler<SketchPointer> PointerEntered;
+        public event EventHandler<SketchPointer> PointerPressed;
+        public event EventHandler<SketchPointer> PointerMoved;
+        public event EventHandler<SketchPointer> PointerReleased;
+        public event EventHandler<SketchPointer> PointerExited;
         public Matrix3x2 InputSpaceToSketchSpaceMatrix { get; set; }
         private object _SketchPointersReadyToEnterLock;
         private List<SketchPointer> _SketchPointersReadyToEnter;
         private object _SketchPointersReadyToExitLock;
         private List<SketchPointer> _SketchPointersReadyToExit;
-        
+        private object _SketchPointersListLock;
         public List<SketchPointer> SketchPointersList;
-        
+
         private IInputManager _InputManager;
-
-        public SketchInputManager() : base()
-        {
-            InputSpaceToSketchSpaceMatrix = Matrix3x2.Identity;
-
-            _SketchPointersReadyToEnterLock = new object();
-            _SketchPointersReadyToExitLock = new object();
-            _SketchPointersReadyToEnter = new List<SketchPointer>();
-            _SketchPointersReadyToExit = new List<SketchPointer>();
-            SketchPointersList = new List<SketchPointer>();
-
-            _InputManager = null;
-
-        }
         public IInputManager InputManager
         {
             get
@@ -49,18 +40,36 @@ namespace RemoteX.Sketch
                     InputManager.PointerEntered -= InputManager_PointerEntered;
                     InputManager.PointerExited -= InputManager_PointerExited;
                     InputManager.PointerPressed -= InputManager_PointerPressed;
-                    
-
                 }
                 _InputManager = value;
                 InputManager.PointerEntered += InputManager_PointerEntered;
                 InputManager.PointerExited += InputManager_PointerExited;
+                InputManager.PointerMoved += InputManager_PointerMoved;
                 InputManager.PointerPressed += InputManager_PointerPressed;
                 InputManager.PointerReleased += InputManager_PointerReleased;
             }
         }
 
-        
+
+
+        private object _PointerInfoCachesLock;
+        private Queue<PointerInfoCache> _PointerInfoCaches;
+
+        public SketchInputManager() : base()
+        {
+            InputSpaceToSketchSpaceMatrix = Matrix3x2.Identity;
+
+            _SketchPointersReadyToEnterLock = new object();
+            _SketchPointersReadyToExitLock = new object();
+            _SketchPointersReadyToEnter = new List<SketchPointer>();
+            _SketchPointersReadyToExit = new List<SketchPointer>();
+            _SketchPointersListLock = new object();
+            SketchPointersList = new List<SketchPointer>();
+            _PointerInfoCachesLock = new object();
+            _PointerInfoCaches = new Queue<PointerInfoCache>();
+            _InputManager = null;
+
+        }
 
         protected override void OnInstantiated()
         {
@@ -83,28 +92,77 @@ namespace RemoteX.Sketch
         protected override void Update()
         {
             base.Update();
-            lock(_SketchPointersReadyToEnterLock)
+            lock (_SketchPointersReadyToEnterLock)
             {
                 SketchPointersList.AddRange(_SketchPointersReadyToEnter);
                 _SketchPointersReadyToEnter.Clear();
             }
-
-            lock(_SketchPointersReadyToExitLock)
+            Queue<PointerInfoCache> cacheQueue;
+            lock (_PointerInfoCachesLock)
             {
-                foreach(var readyToExtiPointer in _SketchPointersReadyToExit)
+                cacheQueue = new Queue<PointerInfoCache>(_PointerInfoCaches);
+                _PointerInfoCaches.Clear();
+            }
+            while (cacheQueue.Count != 0)
+            {
+                PointerInfoCache cache = cacheQueue.Dequeue();
+                if(cache.CacheEvent == PointerInfoCacheEvent.Moved)
+                {
+                    cache.HitLayer = cache.SketchPointer.LatestPointerInfoCache.HitLayer;
+                }
+                cache.SketchPointer.LatestPointerInfoCache = cache;
+                if(cache.CacheEvent == PointerInfoCacheEvent.Pressed)
+                {
+                    foreach (var sketchObject in SketchEngine.SketchObjectList)
+                    {
+                        if (sketchObject is IInputComponent)
+                        {
+                            if ((sketchObject as IInputComponent).StartRegion.IsOverlapPoint(cache.SketchPointer.Point))
+                            {
+                                cache.HitLayer = (sketchObject as IInputComponent).Level;
+                                break;
+                            }
+                        }
+                    }
+                    cache.SketchPointer.LatestPointerInfoCache = cache;
+                }
+                switch (cache.CacheEvent)
+                {
+                    case PointerInfoCacheEvent.Entered:
+                        PointerEntered?.Invoke(this, cache.SketchPointer);
+                        break;
+                    case PointerInfoCacheEvent.Pressed:
+                        PointerPressed?.Invoke(this, cache.SketchPointer);
+                        break;
+                    case PointerInfoCacheEvent.Moved:
+                        PointerMoved?.Invoke(this, cache.SketchPointer);
+                        break;
+                    case PointerInfoCacheEvent.Released:
+                        PointerReleased?.Invoke(this, cache.SketchPointer);
+                        break;
+                    case PointerInfoCacheEvent.Exited:
+                        PointerExited?.Invoke(this, cache.SketchPointer);
+                        break;
+                }
+            }
+
+            lock (_SketchPointersReadyToExitLock)
+            {
+                foreach (var readyToExtiPointer in _SketchPointersReadyToExit)
                 {
                     SketchPointersList.Remove(readyToExtiPointer);
                 }
                 _SketchPointersReadyToExit.Clear();
-                
+
             }
         }
 
         private void InputManager_PointerReleased(object sender, IPointer e)
         {
-            lock (_SketchPointersReadyToExitLock)
+            SketchPointer sketchPointer = null;
+            lock (_SketchPointersListLock)
             {
-                SketchPointer sketchPointer = SketchPointersList.Find((obj) =>
+                sketchPointer = SketchPointersList.Find((obj) =>
                 {
                     if (obj.Pointer == e)
                     {
@@ -112,19 +170,37 @@ namespace RemoteX.Sketch
                     }
                     return false;
                 });
-
-                if (sketchPointer != null)
+            }
+            if (sketchPointer == null)
+            {
+                lock (_SketchPointersReadyToEnterLock)
                 {
-                    sketchPointer.HitLayer = -1;
+                    sketchPointer = _SketchPointersReadyToEnter.Find((obj) =>
+                    {
+                        if (obj.Pointer == e)
+                        {
+                            return true;
+                        }
+                        return false;
+                    });
+                }
+            }
+            if (sketchPointer != null)
+            {
+                var cache = new PointerInfoCache(sketchPointer, -1, PointerInfoCacheEvent.Released);
+                lock (_PointerInfoCachesLock)
+                {
+                    _PointerInfoCaches.Enqueue(cache);
                 }
             }
         }
 
         private void InputManager_PointerPressed(object sender, IPointer e)
         {
-            lock (_SketchPointersReadyToExitLock)
+            SketchPointer sketchPointer = null;
+            lock (_SketchPointersListLock)
             {
-                SketchPointer sketchPointer = SketchPointersList.Find((obj) =>
+                sketchPointer = SketchPointersList.Find((obj) =>
                 {
                     if (obj.Pointer == e)
                     {
@@ -132,34 +208,80 @@ namespace RemoteX.Sketch
                     }
                     return false;
                 });
-
-                if(sketchPointer != null)
+            }
+            if (sketchPointer == null)
+            {
+                lock (_SketchPointersReadyToEnterLock)
                 {
-                    //throw new NotImplementedException("Do Remember implement Hit test and get layer");
-                    foreach(var sketchObject in SketchEngine.SketchObjectList)
+                    sketchPointer = _SketchPointersReadyToEnter.Find((obj) =>
                     {
-                        if(sketchObject is IInputComponent)
+                        if (obj.Pointer == e)
                         {
-                            if((sketchObject as IInputComponent).StartRegion.IsOverlapPoint(sketchPointer.Point))
-                            {
-                                sketchPointer.HitLayer = (sketchObject as IInputComponent).Level;
-                                break;
-                            }
+                            return true;
                         }
-                    }
-                    if(sketchPointer.HitLayer < 0)
+                        return false;
+                    });
+                }
+            }
+
+            if (sketchPointer != null)
+            {
+                var cache = new PointerInfoCache(sketchPointer, 0, PointerInfoCacheEvent.Pressed);
+                //throw new NotImplementedException("Do Remember implement Hit test and get layer");
+                
+
+                lock (_PointerInfoCachesLock)
+                {
+                    _PointerInfoCaches.Enqueue(cache);
+                }
+            }
+        }
+
+        private void InputManager_PointerMoved(object sender, IPointer e)
+        {
+            SketchPointer sketchPointer = null;
+            lock (_SketchPointersListLock)
+            {
+                sketchPointer = SketchPointersList.Find((obj) =>
+                {
+                    if (obj.Pointer == e)
                     {
-                        sketchPointer.HitLayer = 0;
+                        return true;
                     }
+                    return false;
+                });
+            }
+            if (sketchPointer == null)
+            {
+                lock (_SketchPointersReadyToEnterLock)
+                {
+                    sketchPointer = _SketchPointersReadyToEnter.Find((obj) =>
+                    {
+                        if (obj.Pointer == e)
+                        {
+                            return true;
+                        }
+                        return false;
+                    });
+                }
+            }
+
+            if (sketchPointer != null)
+            {
+                var cache = new PointerInfoCache(sketchPointer, sketchPointer.LatestPointerInfoCache.HitLayer, PointerInfoCacheEvent.Moved);
+                lock (_PointerInfoCachesLock)
+                {
+                    _PointerInfoCaches.Enqueue(cache);
                 }
             }
         }
 
         private void InputManager_PointerExited(object sender, IPointer e)
         {
-            lock(_SketchPointersReadyToExitLock)
+            SketchPointer sketchPointer = null;
+            lock (_SketchPointersListLock)
             {
-                SketchPointer sketchPointer = SketchPointersList.Find((obj) =>
+                sketchPointer = SketchPointersList.Find((obj) =>
                 {
                     if (obj.Pointer == e)
                     {
@@ -167,27 +289,77 @@ namespace RemoteX.Sketch
                     }
                     return false;
                 });
-                if (sketchPointer != null)
+            }
+            if (sketchPointer == null)
+            {
+                lock (_SketchPointersReadyToEnterLock)
+                {
+                    sketchPointer = _SketchPointersReadyToEnter.Find((obj) =>
+                    {
+                        if (obj.Pointer == e)
+                        {
+                            return true;
+                        }
+                        return false;
+                    });
+                }
+            }
+            if (sketchPointer != null)
+            {
+                lock (_SketchPointersReadyToExitLock)
                 {
                     _SketchPointersReadyToExit.Add(sketchPointer);
                 }
+                var cache = new PointerInfoCache(sketchPointer, sketchPointer.LatestPointerInfoCache.HitLayer, PointerInfoCacheEvent.Exited);
+                lock (_PointerInfoCachesLock)
+                {
+                    _PointerInfoCaches.Enqueue(cache);
+                }
+
             }
-            
+
         }
         private void InputManager_PointerEntered(object sender, IPointer e)
         {
-            lock(_SketchPointersReadyToEnterLock)
+            SketchPointer sketchPointer = new SketchPointer(this, e);
+            lock (_SketchPointersReadyToEnterLock)
             {
-                SketchPointer sketchPointer = new SketchPointer(this, e);
                 _SketchPointersReadyToEnter.Add(sketchPointer);
+            }
+            PointerInfoCache cache = new PointerInfoCache(sketchPointer, -1, PointerInfoCacheEvent.Entered);
+            lock (_PointerInfoCachesLock)
+            {
+                _PointerInfoCaches.Enqueue(cache);
             }
         }
 
-        
+
     }
 
+    internal enum PointerInfoCacheEvent { Entered, Pressed, Moved, Released, Exited }
+    /// <summary>
+    /// Use to cache a PointerInfo when in an event. later redispatch these event in update thread
+    /// </summary>
+    internal struct PointerInfoCache
+    {
+        public PointerInfoCacheEvent CacheEvent { get; set; }
+        public SketchPointer SketchPointer { get; set; }
+        public PointerState State { get; set; }
+        public Vector2 PointerPoint { get; set; }
+        public int HitLayer { get; set; }
+
+        public PointerInfoCache(SketchPointer sketchPointer, int hitLayer, PointerInfoCacheEvent cacheEvent)
+        {
+            SketchPointer = sketchPointer;
+            CacheEvent = cacheEvent;
+            State = sketchPointer.Pointer.LatestState;
+            PointerPoint = sketchPointer.Pointer.PointerPoint;
+            HitLayer = hitLayer;
+        }
+    }
     public class SketchPointer
     {
+
         public IPointer Pointer { get; private set; }
 
         /// <summary>
@@ -195,15 +367,21 @@ namespace RemoteX.Sketch
         /// 0: Pressed but hit nothing
         /// >0: 
         /// </summary>
-        public int HitLayer { get; internal set; }
-        
+        public int HitLayer
+        {
+            get
+            {
+                return LatestPointerInfoCache.HitLayer;
+            }
+        }
+        internal PointerInfoCache LatestPointerInfoCache { get; set; }
         public Vector2 Point
         {
             get
             {
                 //return SketchInputManager.InputSpaceToSketchSpaceMatrix.MultiplyPoint(Pointer.PointerPoint);
                 //return Pointer.PointerPoint.
-                return Vector2.Transform(Pointer.PointerPoint, SketchInputManager.InputSpaceToSketchSpaceMatrix);
+                return Vector2.Transform(LatestPointerInfoCache.PointerPoint, SketchInputManager.InputSpaceToSketchSpaceMatrix);
             }
         }
 
@@ -212,7 +390,8 @@ namespace RemoteX.Sketch
         {
             get
             {
-                return Pointer.LatestState;
+                //return Pointer.LatestState;
+                return LatestPointerInfoCache.State;
             }
         }
 
@@ -222,9 +401,11 @@ namespace RemoteX.Sketch
             Pointer = pointer;
         }
 
+
+
         public override string ToString()
         {
-            return "[" + Pointer.PointerDeviceType + "|" + Point + "|"+HitLayer+"]";
+            return "[" + Pointer.PointerDeviceType + "|" + Point + "|" + State + "|" + HitLayer + "]";
         }
 
 

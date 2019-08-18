@@ -31,9 +31,6 @@ namespace RemoteX.Sketch
                 SKPoint pos = skiaManager.SketchSpaceToCanvasSpaceMatrix.MapPoint(new SKPoint(pointer.Point.X, pointer.Point.Y));
                 canvas.DrawText(pointer.ToString(), pos, _BoardFontPaint);
             }
-            
-
-            
         }
     }
 }

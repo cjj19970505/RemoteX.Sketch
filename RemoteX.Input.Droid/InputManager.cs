@@ -47,9 +47,16 @@ namespace RemoteX.Input.Droid
                         _Touches.Add(pointerId, touch);
                         OnTouchAction?.Invoke(touch, TouchMotionAction.Down);
                         */
-                        if(PointerDict.ContainsKey(pointerId))
+                        if(PointerDict.ContainsKey(pointerId))  //这种情况多半是我在进入断点后把手移开了，就当是释放了手指就好了吧
                         {
-                            throw new NotImplementedException();
+                            //throw new NotImplementedException();
+                            Pointer pointer = PointerDict[pointerId];
+                            Vector2 pos = new Vector2(e.GetX(pointerIndex), e.GetY(pointerIndex));
+                            pointer.UpdatePointer(PointerState.Released);
+                            PointerReleased?.Invoke(this, pointer);
+                            pointer.UpdatePointer(PointerState.Exited);
+                            PointerDict.Remove(pointerId);
+                            PointerExited?.Invoke(this, pointer);
                         }
                         else
                         {

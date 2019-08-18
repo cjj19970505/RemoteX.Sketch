@@ -20,6 +20,8 @@ namespace RemoteX.Sketch.InputComponent
 
         public bool Pressed { get; private set; }
 
+        public SketchInputManager SketchInputManager { get; private set; }
+
         public Joystick() : base()
         {
             OnSketchPointer = null;
@@ -31,21 +33,63 @@ namespace RemoteX.Sketch.InputComponent
             base.OnInstantiated();
             var sketchInfo = SketchEngine.FindObjectByType<SketchInfo>();
             RectTransform = new RectTransform(sketchInfo);
-            
+            SketchInputManager = SketchEngine.FindObjectByType<SketchInputManager>();
+            SketchInputManager.PointerPressed += SketchInputManager_PointerPressed;
+            SketchInputManager.PointerMoved += SketchInputManager_PointerMoved;
+            SketchInputManager.PointerReleased += SketchInputManager_PointerReleased;
+        }
+        private void SketchInputManager_PointerReleased(object sender, SketchPointer e)
+        {
+            if (e != OnSketchPointer)
+            {
+                return;
+            }
+            Pressed = false;
+            OnJoystickUp();
+            OnSketchPointer = null;
+        }
+
+        private void SketchInputManager_PointerMoved(object sender, SketchPointer e)
+        {
+            if(e != OnSketchPointer)
+            {
+                return;
+            }
+            Delta = OnSketchPointer.Point - _StartPos;
+
+        }
+
+        private void SketchInputManager_PointerPressed(object sender, SketchPointer e)
+        {
+            if (OnSketchPointer != null)
+            {
+                return;
+            }
+            if (StartRegion.IsOverlapPoint(e.Point) && e.HitLayer == Level)
+            {
+                if (e.State == Input.PointerState.Pressed)
+                {
+                    OnSketchPointer = e;
+                    _StartPos = OnSketchPointer.Point;
+                    Delta = new Vector2(0, 0);
+                    Pressed = true;
+                    OnJoystickPressed();
+                }
+            }
         }
 
         protected override void Start()
         {
             base.Start();
+            
         }
 
         protected override void Update()
         {
-            
-            SketchInputManager sketchInputManager = SketchEngine.FindObjectByType<SketchInputManager>();
+            /*
             if(OnSketchPointer == null)
             {
-                foreach (var sketchPointer in sketchInputManager.SketchPointers)
+                foreach (var sketchPointer in SketchInputManager.SketchPointers)
                 {
                     if (StartRegion.IsOverlapPoint(sketchPointer.Point) && sketchPointer.HitLayer == Level)
                     {
@@ -74,6 +118,7 @@ namespace RemoteX.Sketch.InputComponent
                     OnSketchPointer = null;
                 }
             }
+            */
             
         }
 

@@ -27,20 +27,21 @@ namespace RemoteX.Sketch.XamExapmple
 
             Sketch = new Sketch();
             Sketch.SkiaManager.Init(CanvasView.InvalidateSurface, SKMatrix.MakeScale(1, -1));
-            Sketch.Start();
+            
             Sketch.SketchEngine.Instantiate<ExampleSketchObject>();
             Sketch.SketchEngine.Instantiate<GridRenderer>();
             Sketch.SketchEngine.Instantiate<PointerInfoBoard>();
-
             Sketch.SkiaManager.BeforePaint += SkiaManager_BeforePaint;
             ManagerManager = DependencyService.Get<IManagerManager>();
             SketchInputManager = Sketch.SketchEngine.Instantiate<SketchInputManager>();
+            Sketch.Start();
             SketchInputManager.Init(ManagerManager.InputManager);
             var joystick = Sketch.SketchEngine.Instantiate<ColorJoystick>();
             joystick.RectTransform.AnchorMax = new Vector2(1, 1);
             joystick.RectTransform.AnchorMin = new Vector2(0, 0);
             joystick.RectTransform.OffsetMax = new Vector2(-100, -100);
             joystick.RectTransform.OffsetMin = new Vector2(100, 100);
+            joystick.Level = 2;
 
             Device.StartTimer(TimeSpan.FromSeconds(1 / 60f), () => { CanvasView.InvalidateSurface(); return !true; });
         }

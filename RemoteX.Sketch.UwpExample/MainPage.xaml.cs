@@ -42,15 +42,16 @@ namespace RemoteX.Sketch.UwpExample
             Sketch = new Sketch();
             Sketch.SkiaManager.Init(SKCanvasView.Invalidate, SKMatrix.MakeScale(1, -1));
             System.Diagnostics.Debug.WriteLine("MainPageThread:" + Thread.CurrentThread.ManagedThreadId);
-            Sketch.Start();
+            
             Sketch.SketchEngine.Instantiate<ExampleSketchObject>();
             Sketch.SketchEngine.Instantiate<GridRenderer>();
             Sketch.SketchEngine.Instantiate<PointerInfoBoard>();
             Sketch.SketchEngine.Instantiate<SketchBorderRenderer>();
-
-
             sketchInputManager = Sketch.SketchEngine.Instantiate<SketchInputManager>();
             sketchInputManager.Init(inputManager);
+
+            Sketch.Start();
+
             var joystick = Sketch.SketchEngine.Instantiate<ColorJoystick>();
             joystick.RectTransform.AnchorMax = new Vector2(1, 1);
             joystick.RectTransform.AnchorMin = new Vector2(0, 0);
