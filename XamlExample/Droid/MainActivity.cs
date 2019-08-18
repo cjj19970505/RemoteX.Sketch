@@ -30,6 +30,8 @@ namespace RemoteX.Sketch.XamExapmple.Droid
             ManagerManagerFragment = DependencyService.Get<IManagerManager>() as ManagerManagerFragment;
             FragmentManager.BeginTransaction().Add(ManagerManagerFragment, "ManagerManager").Commit();
 
+            this.RequestedOrientation = ScreenOrientation.Landscape;
+
             LoadApplication(new App());
         }
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
