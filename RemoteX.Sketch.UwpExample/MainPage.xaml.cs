@@ -1,4 +1,7 @@
 ﻿
+using RemoteX.Bluetooth;
+using RemoteX.Bluetooth.LE.Gatt.Client;
+using RemoteX.Bluetooth.Win10;
 using RemoteX.Input.Win10;
 using RemoteX.Sketch.CoreModule;
 using RemoteX.Sketch.InputComponent;
@@ -34,6 +37,12 @@ namespace RemoteX.Sketch.UwpExample
     {
         public Sketch Sketch { get; }
         SketchInputManager sketchInputManager;
+        IBluetoothManager BluetoothManager { get; }
+
+        IGattClientService GyroService { get; }
+        IGattClientCharacteristic GyroAngularCharacteristic { get; set; }
+        ExampleSketchObject ExampleSketchObject;
+        TestJitterFixer TestJitterFixer = new TestJitterFixer();
         public MainPage()
         {
             this.InitializeComponent();
@@ -42,8 +51,10 @@ namespace RemoteX.Sketch.UwpExample
             Sketch = new Sketch();
             Sketch.SkiaManager.Init(SKCanvasView.Invalidate, SKMatrix.MakeScale(1, -1));
             System.Diagnostics.Debug.WriteLine("MainPageThread:" + Thread.CurrentThread.ManagedThreadId);
-            
-            Sketch.SketchEngine.Instantiate<ExampleSketchObject>();
+
+            BluetoothManager = new BluetoothManager(this.Dispatcher);
+
+            ExampleSketchObject = Sketch.SketchEngine.Instantiate<ExampleSketchObject>();
             Sketch.SketchEngine.Instantiate<GridRenderer>();
             Sketch.SketchEngine.Instantiate<PointerInfoBoard>();
             Sketch.SketchEngine.Instantiate<SketchBorderRenderer>();
@@ -67,13 +78,65 @@ namespace RemoteX.Sketch.UwpExample
             joystick2.Level = 2;
             //InputLayerRect.TransformMatrix;
             Matrix3x2 matrix = Matrix3x2.CreateScale(0.2f, -0.2f);
-
             sketchInputManager.InputSpaceToSketchSpaceMatrix = matrix;
-
             Sketch.SkiaManager.BeforePaint += SkiaManager_BeforePaint;
+
+
+            TestJitterFixer.DataEmited += TestJitterFixer_DataEmited;
+            var dialog = new BleDeviceSelectorDialog(BluetoothManager, BluetoothUtils.ShortValueUuid(0x1234));
+            dialog.Closed += Dialog_Closed;
+            dialog.ShowAsync();
+        }
+        DateTime _PreviousEmitDateTime = DateTime.Now;
+        List<double> DTList = new List<double>();
+        private void TestJitterFixer_DataEmited(object sender, byte[] e)
+        {
+            DTList.Add((DateTime.Now - _PreviousEmitDateTime).TotalMilliseconds);
+            _PreviousEmitDateTime = DateTime.Now;
+            float x = BitConverter.ToSingle(e, 0);
+            float y = BitConverter.ToSingle(e, sizeof(float));
+            float z = BitConverter.ToSingle(e, sizeof(float) * 2);
+            var value = new SKPoint(x * 40, y * 40);
+            ExampleSketchObject.Position = ExampleSketchObject.Position + value;
+        }
+
+        private async void Dialog_Closed(ContentDialog sender, ContentDialogClosedEventArgs args)
+        {
+            var characteristicsResult = await (sender as BleDeviceSelectorDialog).Result.DiscoverAllCharacteristicsAsync();
+            if(characteristicsResult.ProtocolError != Bluetooth.LE.Gatt.GattErrorCode.Success)
+            {
+                await sender.ShowAsync();
+                return;
+            }
+            Guid angularValueGuid = BluetoothUtils.ShortValueUuid(0x1235);
+            foreach(var characteristic in characteristicsResult.Characteristics)
+            {
+                if(characteristic.Uuid == angularValueGuid)
+                {
+                    GyroAngularCharacteristic = characteristic;
+                    break;
+                }
+            }
+            if(GyroAngularCharacteristic == null)
+            {
+                await sender.ShowAsync();
+                return;
+            }
+            var setNotifyResult = await GyroAngularCharacteristic.GattCharacteristicConfiguration.SetValueAsync(true, false);
+            if(setNotifyResult.ProtocolError != Bluetooth.LE.Gatt.GattErrorCode.Success)
+            {
+                GyroAngularCharacteristic = null;
+                await sender.ShowAsync();
+                return;
+            }
+            GyroAngularCharacteristic.OnNotified += GyroAngularCharacteristic_OnNotified;
 
             
 
+        }
+        private void GyroAngularCharacteristic_OnNotified(object sender, byte[] e)
+        {
+            TestJitterFixer.Enqueue(e);
         }
 
         private void SkiaManager_BeforePaint(object sender, SKCanvas e)

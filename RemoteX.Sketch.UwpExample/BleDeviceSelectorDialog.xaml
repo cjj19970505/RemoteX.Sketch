@@ -1,0 +1,34 @@
+﻿<ContentDialog
+    x:Class="RemoteX.Sketch.UwpExample.BleDeviceSelectorDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RemoteX.Sketch.UwpExample"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Selector">
+    <ContentDialog.Resources>
+        <local:MacAddressUlongToStringConverter x:Key="MacAddressUlongToStringConverter"/>
+    </ContentDialog.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="MessageTextBlock" Grid.Row="0"/>
+        <ListView x:Name="ScanResultListView" Grid.Row="1">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:BleDeviceViewModel">
+                    <StackPanel Margin="5">
+                        <TextBlock Text="{Binding Path=Name, Mode=OneWay}" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding Path=Address, Mode=OneWay, Converter={StaticResource MacAddressUlongToStringConverter}}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Button x:Name="ConnectButton" Grid.Row="2" Content="Connect" HorizontalAlignment="Right"/>
+    </Grid>
+    
+</ContentDialog>

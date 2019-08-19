@@ -12,6 +12,15 @@ namespace RemoteX.Sketch
     {
         public SKPoint Position = new SKPoint(0, 0);
         public SKPoint Velocity = new SKPoint(50, 50);
+
+        public SketchInputManager SketchInputManager { get; private set; }
+
+
+        protected override void OnInstantiated()
+        {
+            base.OnInstantiated();
+        }
+
         public void PaintSurface(SkiaManager skiaManager ,SKCanvas canvas)
         {
             //System.Diagnostics.Debug.WriteLine("PaintSurface");
@@ -26,7 +35,9 @@ namespace RemoteX.Sketch
         protected override void Update()
         {
             Position = Position + new SKPoint(Velocity.X * SketchEngine.Time.DeltaTime, Velocity.Y * SketchEngine.Time.DeltaTime);
-
+            
         }
+
+
     }
 }

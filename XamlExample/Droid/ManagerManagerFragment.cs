@@ -11,7 +11,8 @@ using Android.Runtime;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
-
+using RemoteX.Bluetooth;
+using RemoteX.Bluetooth.Droid;
 
 [assembly: Xamarin.Forms.Dependency(typeof(RemoteX.Sketch.XamExapmple.Droid.ManagerManagerFragment))]
 namespace RemoteX.Sketch.XamExapmple.Droid
@@ -31,6 +32,18 @@ namespace RemoteX.Sketch.XamExapmple.Droid
                     _InputManager = new RemoteX.Input.Droid.InputManager();
                 }
                 return _InputManager;
+            }
+        }
+        private IBluetoothManager _BluetoothManager;
+        public IBluetoothManager BluetoothManager
+        {
+            get
+            {
+                if(_BluetoothManager == null)
+                {
+                    _BluetoothManager = new BluetoothManager();
+                }
+                return _BluetoothManager;
             }
         }
 

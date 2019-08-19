@@ -1,5 +1,7 @@
-﻿using RemoteX.Sketch.InputComponent;
+﻿using RemoteX.Bluetooth.LE.Gatt.Server;
+using RemoteX.Sketch.InputComponent;
 using RemoteX.Sketch.Skia;
+using RemoteX.Sketch.XamExapmple.BleServices;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -22,12 +24,21 @@ namespace RemoteX.Sketch.XamExapmple
         SketchInputManager SketchInputManager { get; }
 
         ExampleSketchObject ExampleSketchObject;
+        GyroscopeServiceWrapper GyroscopeServiceWrapper;
         public MainPage()
         {
 
             InitializeComponent();
             //AbsoluteLayout.SetLayoutFlags(CanvasView, AbsoluteLayoutFlags.All);
             //AbsoluteLayout.SetLayoutBounds(CanvasView, new Rectangle(0, 0, 1, 1));
+            var bluetoothManager = DependencyService.Get<IManagerManager>().BluetoothManager;
+            var deviceInfomationService = new DeviceInfomationServiceBuilder(bluetoothManager).Build();
+            
+            bluetoothManager.GattSever.AddService(new DeviceInfomationServiceBuilder(bluetoothManager).Build());
+            GyroscopeServiceWrapper = new GyroscopeServiceWrapper(bluetoothManager);
+            bluetoothManager.GattSever.AddService(GyroscopeServiceWrapper.GattServerService);
+            bluetoothManager.GattSever.StartAdvertising();
+
 
             Sketch = new Sketch();
             Sketch.SkiaManager.Init(CanvasView.InvalidateSurface, SKMatrix.MakeScale(1, -1));
@@ -57,10 +68,18 @@ namespace RemoteX.Sketch.XamExapmple
             Device.StartTimer(TimeSpan.FromSeconds(1 / 60f), () => { CanvasView.InvalidateSurface(); return !true; });
         }
 
+        private DateTime _PreviousReadDateTime = DateTime.Now;
         private void Gyroscope_ReadingChanged(object sender, GyroscopeChangedEventArgs e)
         {
+            var timeSpan = (DateTime.Now - _PreviousReadDateTime).TotalMilliseconds;
+            if(timeSpan < 1000.0/40)
+            {
+                return;
+            }
+            _PreviousReadDateTime = DateTime.Now;
             var delta = new SKPoint(e.Reading.AngularVelocity.X*10, e.Reading.AngularVelocity.Y*10);
             ExampleSketchObject.Position = ExampleSketchObject.Position + delta;
+            GyroscopeServiceWrapper.UpdateAngularVelocity(e.Reading.AngularVelocity);
         }
 
         private void SkiaManager_BeforePaint(object sender, SKCanvas e)
