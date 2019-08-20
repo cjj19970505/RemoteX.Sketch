@@ -123,6 +123,7 @@
       <DependentUpon>BleDeviceSelectorDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="BleDeviceViewModel.cs" />
+    <Compile Include="Constant.cs" />
     <Compile Include="MacAddressUlongToStringConverter.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>

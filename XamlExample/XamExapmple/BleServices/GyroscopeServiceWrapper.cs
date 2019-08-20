@@ -19,7 +19,7 @@ namespace RemoteX.Sketch.XamExapmple.BleServices
             BluetoothManager = bluetoothManager;
             AngularVelocityCharacteristicWrapper = new GyroscopeAngularVelocityCharacteristicWrapper(this);
             IGattServiceBuilder builder = bluetoothManager.NewGattServiceBuilder();
-            GattServerService = builder.SetUuid(Uuid)
+            GattServerService = builder.SetUuid(Constant.GyroscopeServiceGuid)
                 .AddCharacteristics(AngularVelocityCharacteristicWrapper.GattServerCharacteristic)
                 .Build();
 
@@ -33,7 +33,7 @@ namespace RemoteX.Sketch.XamExapmple.BleServices
 
     public class GyroscopeAngularVelocityCharacteristicWrapper
     {
-        public Guid Uuid = BluetoothUtils.ShortValueUuid(0x1235);
+        public Guid Uuid = Constant.GyroscopeAngularVelocityCharacteristicGuid;
         public ClientCharacteristicConfigurationDescriptorWrapper ClientCharacteristicConfigurationDescriptorWrapper { get; }
         public GyroscopeServiceWrapper GyroscopeServiceWrapper { get; }
         private static GattCharacteristicProperties Properties = new GattCharacteristicProperties

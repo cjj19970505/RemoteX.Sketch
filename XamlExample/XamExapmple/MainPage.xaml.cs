@@ -1,4 +1,5 @@
 ﻿using RemoteX.Bluetooth.LE.Gatt.Server;
+using RemoteX.Bluetooth.Rfcomm;
 using RemoteX.Sketch.InputComponent;
 using RemoteX.Sketch.Skia;
 using RemoteX.Sketch.XamExapmple.BleServices;
@@ -25,6 +26,8 @@ namespace RemoteX.Sketch.XamExapmple
 
         ExampleSketchObject ExampleSketchObject;
         GyroscopeServiceWrapper GyroscopeServiceWrapper;
+        ClientRfcommServiceWrapper ClientRfcommServiceWrapper;
+        IRfcommConnection GyroConnection { get; set; }
         public MainPage()
         {
 
@@ -36,9 +39,13 @@ namespace RemoteX.Sketch.XamExapmple
             
             bluetoothManager.GattSever.AddService(new DeviceInfomationServiceBuilder(bluetoothManager).Build());
             GyroscopeServiceWrapper = new GyroscopeServiceWrapper(bluetoothManager);
-            bluetoothManager.GattSever.AddService(GyroscopeServiceWrapper.GattServerService);
+            ClientRfcommServiceWrapper = new ClientRfcommServiceWrapper(bluetoothManager);
+            
+            bluetoothManager.GattSever.AddService(ClientRfcommServiceWrapper.GattServerService);
+            bluetoothManager.GattSever.AddService(new BatteryServiceWrapper(bluetoothManager).GattServerService);
+            //bluetoothManager.GattSever.AddService(GyroscopeServiceWrapper.GattServerService);
             bluetoothManager.GattSever.StartAdvertising();
-
+            ClientRfcommServiceWrapper.OnRfcommAddressWrite += ClientRfcommServiceWrapper_OnRfcommAddressWrite;
 
             Sketch = new Sketch();
             Sketch.SkiaManager.Init(CanvasView.InvalidateSurface, SKMatrix.MakeScale(1, -1));
@@ -66,6 +73,32 @@ namespace RemoteX.Sketch.XamExapmple
             Gyroscope.Start(speed);
 
             Device.StartTimer(TimeSpan.FromSeconds(1 / 60f), () => { CanvasView.InvalidateSurface(); return !true; });
+        }
+
+        private async void ClientRfcommServiceWrapper_OnRfcommAddressWrite(object sender, KeyValuePair<Bluetooth.IBluetoothDevice, ulong> e)
+        {
+            var bluetoothManager = DependencyService.Get<IManagerManager>().BluetoothManager;
+            var device = bluetoothManager.GetBluetoothDevice(e.Value);
+            await device.RfcommConnectAsync();
+            var serviceResult = await device.GetRfcommServicesAsync();
+            if(serviceResult.Error != Bluetooth.Rfcomm.BluetoothError.Success)
+            {
+                return;
+            }
+            IRfcommDeviceService gyroService = null;
+            foreach(var service in serviceResult.Services)
+            {
+                if(service.ServiceId == Constant.GyroscopeServiceGuid)
+                {
+                    gyroService = service;
+                }
+            }
+            if(gyroService == null)
+            {
+                return;
+            }
+            await gyroService.ConnectAsync();
+            GyroConnection = gyroService.RfcommConnection;
         }
 
         private DateTime _PreviousReadDateTime = DateTime.Now;
