@@ -1,6 +1,8 @@
 ﻿
 using RemoteX.Bluetooth;
 using RemoteX.Bluetooth.LE.Gatt.Client;
+using RemoteX.Bluetooth.LE.Gatt.Server;
+using RemoteX.Bluetooth.Procedure.Client;
 using RemoteX.Bluetooth.Win10;
 using RemoteX.Input.Win10;
 using RemoteX.Sketch.CoreModule;
@@ -25,6 +27,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using RemoteX.Bluetooth.Rfcomm;
+using RemoteX.Sketch.Bluetooth;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 
@@ -43,6 +47,7 @@ namespace RemoteX.Sketch.UwpExample
         IGattClientCharacteristic GyroAngularCharacteristic { get; set; }
         ExampleSketchObject ExampleSketchObject;
         TestJitterFixer TestJitterFixer = new TestJitterFixer();
+        GyroscopeRfcommServiceConnectionWrapper GyroscopeRfcommServiceConnection;
         public MainPage()
         {
             this.InitializeComponent();
@@ -82,8 +87,28 @@ namespace RemoteX.Sketch.UwpExample
             Sketch.SkiaManager.BeforePaint += SkiaManager_BeforePaint;
 
 
+            
+            var characteristicDict = new Dictionary<Guid, List<CharacteristicProfile>>();
+            characteristicDict.Add(BatteryServiceWrapper.BATTERY_SERVICE_UUID, new List<CharacteristicProfile>()
+            {
+                new CharacteristicProfile
+                {
+                    Notified = true,
+                    Guid = BatteryLevelCharacteristicWrapper.BATTERY_LEVEL_UUID
+                }
+            });
+            var serviceId = new List<Guid>
+            {
+                GyroscopeRfcommServiceConnectionWrapper.RfcommServiceId
+            };
+            ConnectionProfile profile = new ConnectionProfile()
+            {
+                RequiredCharacteristicGuids = characteristicDict,
+                RequiredServiceGuids = serviceId
+            };
+
             TestJitterFixer.DataEmited += TestJitterFixer_DataEmited;
-            var dialog = new BleDeviceSelectorDialog(BluetoothManager, BluetoothUtils.ShortValueUuid(0x1234));
+            var dialog = new BleDeviceSelectorDialog(BluetoothManager, profile);
             dialog.Closed += Dialog_Closed;
             dialog.ShowAsync();
         }
@@ -100,43 +125,16 @@ namespace RemoteX.Sketch.UwpExample
             ExampleSketchObject.Position = ExampleSketchObject.Position + value;
         }
 
-        private async void Dialog_Closed(ContentDialog sender, ContentDialogClosedEventArgs args)
+        private void Dialog_Closed(ContentDialog sender, ContentDialogClosedEventArgs args)
         {
-            var characteristicsResult = await (sender as BleDeviceSelectorDialog).Result.DiscoverAllCharacteristicsAsync();
-            if(characteristicsResult.ProtocolError != Bluetooth.LE.Gatt.GattErrorCode.Success)
-            {
-                await sender.ShowAsync();
-                return;
-            }
-            Guid angularValueGuid = BluetoothUtils.ShortValueUuid(0x1235);
-            foreach(var characteristic in characteristicsResult.Characteristics)
-            {
-                if(characteristic.Uuid == angularValueGuid)
-                {
-                    GyroAngularCharacteristic = characteristic;
-                    break;
-                }
-            }
-            if(GyroAngularCharacteristic == null)
-            {
-                await sender.ShowAsync();
-                return;
-            }
-            var setNotifyResult = await GyroAngularCharacteristic.GattCharacteristicConfiguration.SetValueAsync(true, false);
-            if(setNotifyResult.ProtocolError != Bluetooth.LE.Gatt.GattErrorCode.Success)
-            {
-                GyroAngularCharacteristic = null;
-                await sender.ShowAsync();
-                return;
-            }
-            GyroAngularCharacteristic.OnNotified += GyroAngularCharacteristic_OnNotified;
-
-            
-
+            var procedureResult = (sender as BleDeviceSelectorDialog).Result;
+            GyroscopeRfcommServiceConnection = new GyroscopeRfcommServiceConnectionWrapper(procedureResult[GyroscopeRfcommServiceConnectionWrapper.RfcommServiceId].RfcommConnection);
+            GyroscopeRfcommServiceConnection.OnReadingUpdated += GyroscopeRfcommServiceConnection_OnReadingUpdated;
         }
-        private void GyroAngularCharacteristic_OnNotified(object sender, byte[] e)
+
+        private void GyroscopeRfcommServiceConnection_OnReadingUpdated(object sender, Vector3 e)
         {
-            TestJitterFixer.Enqueue(e);
+            ExampleSketchObject.Position += new SKPoint(e.X*40, e.Y*40);
         }
 
         private void SkiaManager_BeforePaint(object sender, SKCanvas e)

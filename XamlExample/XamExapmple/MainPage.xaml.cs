@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using RemoteX.Sketch.Bluetooth;
+using RemoteX.Bluetooth.Procedure.Server;
 
 namespace RemoteX.Sketch.XamExapmple
 {
@@ -25,9 +27,7 @@ namespace RemoteX.Sketch.XamExapmple
         SketchInputManager SketchInputManager { get; }
 
         ExampleSketchObject ExampleSketchObject;
-        GyroscopeServiceWrapper GyroscopeServiceWrapper;
-        ClientRfcommServiceWrapper ClientRfcommServiceWrapper;
-        IRfcommConnection GyroConnection { get; set; }
+        GyroscopeRfcommServiceConnectionWrapper GyroscopeRfcommServiceConnectionWrapper;
         public MainPage()
         {
 
@@ -38,15 +38,15 @@ namespace RemoteX.Sketch.XamExapmple
             var deviceInfomationService = new DeviceInfomationServiceBuilder(bluetoothManager).Build();
             
             bluetoothManager.GattSever.AddService(new DeviceInfomationServiceBuilder(bluetoothManager).Build());
-            GyroscopeServiceWrapper = new GyroscopeServiceWrapper(bluetoothManager);
-            ClientRfcommServiceWrapper = new ClientRfcommServiceWrapper(bluetoothManager);
-            
-            bluetoothManager.GattSever.AddService(ClientRfcommServiceWrapper.GattServerService);
             bluetoothManager.GattSever.AddService(new BatteryServiceWrapper(bluetoothManager).GattServerService);
-            //bluetoothManager.GattSever.AddService(GyroscopeServiceWrapper.GattServerService);
+            bluetoothManager.GattSever.AddService(new RfcommServerServiceWrapper(bluetoothManager).GattServerService);
             bluetoothManager.GattSever.StartAdvertising();
-            ClientRfcommServiceWrapper.OnRfcommAddressWrite += ClientRfcommServiceWrapper_OnRfcommAddressWrite;
 
+            var createServiceProviderTask = bluetoothManager.CreateRfcommServiceProviderAsync(GyroscopeRfcommServiceConnectionWrapper.RfcommServiceId);
+            createServiceProviderTask.Wait();
+            var gyroRfcommServiceProvider = createServiceProviderTask.Result;
+            gyroRfcommServiceProvider.OnConnectionReceived += GyroRfcommServiceProvider_OnConnectionReceived;
+            gyroRfcommServiceProvider.StartAdvertising();
             Sketch = new Sketch();
             Sketch.SkiaManager.Init(CanvasView.InvalidateSurface, SKMatrix.MakeScale(1, -1));
             
@@ -75,35 +75,19 @@ namespace RemoteX.Sketch.XamExapmple
             Device.StartTimer(TimeSpan.FromSeconds(1 / 60f), () => { CanvasView.InvalidateSurface(); return !true; });
         }
 
-        private async void ClientRfcommServiceWrapper_OnRfcommAddressWrite(object sender, KeyValuePair<Bluetooth.IBluetoothDevice, ulong> e)
+        private void GyroRfcommServiceProvider_OnConnectionReceived(object sender, IRfcommConnection e)
         {
-            var bluetoothManager = DependencyService.Get<IManagerManager>().BluetoothManager;
-            var device = bluetoothManager.GetBluetoothDevice(e.Value);
-            await device.RfcommConnectAsync();
-            var serviceResult = await device.GetRfcommServicesAsync();
-            if(serviceResult.Error != Bluetooth.Rfcomm.BluetoothError.Success)
-            {
-                return;
-            }
-            IRfcommDeviceService gyroService = null;
-            foreach(var service in serviceResult.Services)
-            {
-                if(service.ServiceId == Constant.GyroscopeServiceGuid)
-                {
-                    gyroService = service;
-                }
-            }
-            if(gyroService == null)
-            {
-                return;
-            }
-            await gyroService.ConnectAsync();
-            GyroConnection = gyroService.RfcommConnection;
+            GyroscopeRfcommServiceConnectionWrapper = new GyroscopeRfcommServiceConnectionWrapper(e);
+            //_ = GyroscopeRfcommServiceConnectionWrapper.UpdateReadingAsync(new Vector3(100, 100, 100));
         }
 
         private DateTime _PreviousReadDateTime = DateTime.Now;
-        private void Gyroscope_ReadingChanged(object sender, GyroscopeChangedEventArgs e)
+        private async void Gyroscope_ReadingChanged(object sender, GyroscopeChangedEventArgs e)
         {
+            if(GyroscopeRfcommServiceConnectionWrapper == null)
+            {
+                return;
+            }
             var timeSpan = (DateTime.Now - _PreviousReadDateTime).TotalMilliseconds;
             if(timeSpan < 1000.0/40)
             {
@@ -112,7 +96,7 @@ namespace RemoteX.Sketch.XamExapmple
             _PreviousReadDateTime = DateTime.Now;
             var delta = new SKPoint(e.Reading.AngularVelocity.X*10, e.Reading.AngularVelocity.Y*10);
             ExampleSketchObject.Position = ExampleSketchObject.Position + delta;
-            GyroscopeServiceWrapper.UpdateAngularVelocity(e.Reading.AngularVelocity);
+            await GyroscopeRfcommServiceConnectionWrapper.UpdateReadingAsync(e.Reading.AngularVelocity);
         }
 
         private void SkiaManager_BeforePaint(object sender, SKCanvas e)
