@@ -28,6 +28,7 @@ namespace RemoteX.Sketch.XamExapmple
 
         ExampleSketchObject ExampleSketchObject;
         GyroscopeRfcommServiceConnectionWrapper GyroscopeRfcommServiceConnectionWrapper;
+        KeyboardServiceWrapper KeyboardServiceWrapper;
         public MainPage()
         {
 
@@ -38,8 +39,10 @@ namespace RemoteX.Sketch.XamExapmple
             var deviceInfomationService = new DeviceInfomationServiceBuilder(bluetoothManager).Build();
             
             bluetoothManager.GattSever.AddService(new DeviceInfomationServiceBuilder(bluetoothManager).Build());
-            bluetoothManager.GattSever.AddService(new BatteryServiceWrapper(bluetoothManager).GattServerService);
+            //bluetoothManager.GattSever.AddService(new BatteryServiceWrapper(bluetoothManager).GattServerService);
             bluetoothManager.GattSever.AddService(new RfcommServerServiceWrapper(bluetoothManager).GattServerService);
+            KeyboardServiceWrapper = new KeyboardServiceWrapper(bluetoothManager);
+            bluetoothManager.GattSever.AddService(KeyboardServiceWrapper.GattServerService);
             bluetoothManager.GattSever.StartAdvertising();
 
             var createServiceProviderTask = bluetoothManager.CreateRfcommServiceProviderAsync(GyroscopeRfcommServiceConnectionWrapper.RfcommServiceId);
@@ -52,7 +55,7 @@ namespace RemoteX.Sketch.XamExapmple
             
             
             Sketch.SketchEngine.Instantiate<GridRenderer>();
-            Sketch.SketchEngine.Instantiate<PointerInfoBoard>();
+            //Sketch.SketchEngine.Instantiate<PointerInfoBoard>();
             Sketch.SkiaManager.BeforePaint += SkiaManager_BeforePaint;
             ManagerManager = DependencyService.Get<IManagerManager>();
             SketchInputManager = Sketch.SketchEngine.Instantiate<SketchInputManager>();
@@ -61,9 +64,24 @@ namespace RemoteX.Sketch.XamExapmple
             var joystick = Sketch.SketchEngine.Instantiate<ColorJoystick>();
             joystick.RectTransform.AnchorMax = new Vector2(1, 1);
             joystick.RectTransform.AnchorMin = new Vector2(0, 0);
-            joystick.RectTransform.OffsetMax = new Vector2(-200, -200);
-            joystick.RectTransform.OffsetMin = new Vector2(200, 200);
+            joystick.RectTransform.OffsetMax = new Vector2(-800, -800);
+            joystick.RectTransform.OffsetMin = new Vector2(10, 10);
             joystick.Level = 2;
+
+            var joystick2 = Sketch.SketchEngine.Instantiate<LineAreaJoystick>();
+            joystick2.RectTransform.AnchorMax = new Vector2(1, 1);
+            joystick2.RectTransform.AnchorMin = new Vector2(0, 0);
+            joystick2.RectTransform.OffsetMax = new Vector2(-200, -200);
+            joystick2.RectTransform.OffsetMin = new Vector2(200, 200);
+            joystick2.Level = 3;
+
+            joystick2.AddArea(AreaJoystick.Area.CreateFromAngle("d", -60, 60, 0, 1f));
+            joystick2.AddArea(AreaJoystick.Area.CreateFromAngle("w", 30, 150, 0, 1f));
+            joystick2.AddArea(AreaJoystick.Area.CreateFromAngle("a", 120, 240, 0, 1f));
+            joystick2.AddArea(AreaJoystick.Area.CreateFromAngle("s", 210, 330, 0, 1f));
+            joystick2.AddArea(AreaJoystick.Area.CreateFromAngle("shift", 0, 360, 0.7f, 1f));
+
+            joystick2.OnAreaStatusChanged += Joystick2_OnAreaStatusChanged;
             ExampleSketchObject = Sketch.SketchEngine.Instantiate<ExampleSketchObject>();
             CanvasView.InvalidateSurface();
             ExampleSketchObject.Position = new SKPoint(Sketch.Width/2, Sketch.Height/2);
@@ -73,6 +91,32 @@ namespace RemoteX.Sketch.XamExapmple
             Gyroscope.Start(speed);
 
             Device.StartTimer(TimeSpan.FromSeconds(1 / 60f), () => { CanvasView.InvalidateSurface(); return !true; });
+        }
+
+        private void Joystick2_OnAreaStatusChanged(object sender, AreaJoystick.AreaStatusChangeEventArgs e)
+        {
+            byte keyCode = 0;
+            if(e.Area.AreaName == "w")
+            {
+                keyCode = (byte)'w';
+            }
+            else if(e.Area.AreaName == "a")
+            {
+                keyCode = (byte)'a';
+            }
+            else if (e.Area.AreaName == "s")
+            {
+                keyCode = (byte)'s';
+            }
+            else if (e.Area.AreaName == "d")
+            {
+                keyCode = (byte)'d';
+            }
+            if(keyCode == 0)
+            {
+                return;
+            }
+            KeyboardServiceWrapper.UpdateKeyStatus(keyCode, (KeyStatus)e.NewStatus);
         }
 
         private void GyroRfcommServiceProvider_OnConnectionReceived(object sender, IRfcommConnection e)

@@ -75,7 +75,7 @@ namespace RemoteX.Sketch.UwpExample
             joystick.RectTransform.OffsetMin = new Vector2(100, 100);
             joystick.Level = 1;
 
-            var joystick2 = Sketch.SketchEngine.Instantiate<ColorJoystick>();
+            var joystick2 = Sketch.SketchEngine.Instantiate<LineAreaJoystick>();
             joystick2.RectTransform.AnchorMax = new Vector2(0, 0);
             joystick2.RectTransform.AnchorMin = new Vector2(0, 0);
             joystick2.RectTransform.OffsetMax = new Vector2(-10, -10);

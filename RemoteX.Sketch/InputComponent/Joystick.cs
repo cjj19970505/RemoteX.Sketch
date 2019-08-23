@@ -56,6 +56,7 @@ namespace RemoteX.Sketch.InputComponent
                 return;
             }
             Delta = OnSketchPointer.Point - _StartPos;
+            OnDeltaChanged();
 
         }
 
@@ -122,8 +123,8 @@ namespace RemoteX.Sketch.InputComponent
             
         }
 
-        protected abstract void OnJoystickPressed();
-
-        protected abstract void OnJoystickUp();
+        protected virtual void OnJoystickPressed() { }
+        protected virtual void OnJoystickUp() { }
+        protected virtual void OnDeltaChanged() { }
     }
 }
