@@ -37,6 +37,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoHotkey.Interop">
+      <HintPath>..\AutoHotkey.Interop\AutoHotkey.Interop.dll</HintPath>
+    </Reference>
     <Reference Include="RemoteX.Bluetooth, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RemoteX.Bluetooth.1.0.8\lib\netstandard2.0\RemoteX.Bluetooth.dll</HintPath>
     </Reference>
@@ -48,6 +51,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -60,6 +67,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsInput, Version=1.0.4.0, Culture=neutral, PublicKeyToken=9b287f7dc5073cad, processorArchitecture=MSIL">
+      <HintPath>..\packages\InputSimulator.1.0.4.0\lib\net20\WindowsInput.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -81,6 +91,7 @@
     <Compile Include="BleDeviceSelectorWindow.xaml.cs">
       <DependentUpon>BleDeviceSelectorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="KeyAction.cs" />
     <Compile Include="MacAddressUlongToStringConverter.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -113,6 +124,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RemoteX.Sketch.Bluetooth\RemoteX.Sketch.Bluetooth.csproj">
+      <Project>{09886ABA-676A-49C0-92E8-F0530662111C}</Project>
+      <Name>RemoteX.Sketch.Bluetooth</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\AutoHotkey.Interop\x86\v2_AutoHotkey.dll">
+      <Link>x86\v2_AutoHotkey.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

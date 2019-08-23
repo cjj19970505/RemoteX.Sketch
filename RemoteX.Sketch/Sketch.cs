@@ -45,7 +45,7 @@ namespace RemoteX.Sketch
             SketchInfo = SketchEngine.Instantiate<SketchInfo>();
             SketchInfo.Init(this);
             Width = 1000;
-            Height = 1000;
+            Height = 200;
         }
         
         public void Start()

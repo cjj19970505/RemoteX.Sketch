@@ -54,8 +54,8 @@ namespace RemoteX.Sketch.Bluetooth
 
         private void ConnectionHandler_OnReceived(object sender, byte[] e)
         {
-            TestJitterFixer.Enqueue(e);
-            
+            //TestJitterFixer.Enqueue(e);
+            TestJitterFixer_DataEmited(this, e);
         }
 
         public async Task UpdateReadingAsync(Vector3 reading)

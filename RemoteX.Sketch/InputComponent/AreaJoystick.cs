@@ -5,18 +5,18 @@ using System.Text;
 
 namespace RemoteX.Sketch.InputComponent
 {
-    public class AreaJoystick : Joystick
+    public class AreaJoystick<IdentifierType> : Joystick where IdentifierType:IEquatable<IdentifierType>
     {
-        public event EventHandler<AreaStatusChangeEventArgs> OnAreaStatusChanged;
-        protected List<Area> AreaList { get; }
+        public event EventHandler<AreaStatusChangeEventArgs<IdentifierType>> OnAreaStatusChanged;
+        protected List<Area<IdentifierType>> AreaList { get; }
         public float MaxLength = 300;
-        public Area this[string areaName]
+        public Area<IdentifierType> this[IdentifierType areaName]
         {
             get
             {
                 foreach (var area in AreaList)
                 {
-                    if (area.AreaName == areaName)
+                    if (area.AreaIdentifier.Equals(areaName))
                     {
                         return area;
                     }
@@ -26,16 +26,29 @@ namespace RemoteX.Sketch.InputComponent
         }
 
         
-        public void AddArea(Area area)
+        public void AddArea(Area<IdentifierType> area)
         {
             area.Status = AreaStatus.Released;
             AreaList.Add(area);
         }
         public AreaJoystick() : base()
         {
-            AreaList = new List<Area>();
+            AreaList = new List<Area<IdentifierType>>();
         }
 
+        protected override void OnJoystickUp()
+        {
+            foreach (var area in AreaList)
+            {
+                var oldStatus = area.Status;
+                if (oldStatus != AreaStatus.Released)
+                {
+                    //AreaStatusDict[area] = AreaStatus.Released;
+                    area.Status = AreaStatus.Released;
+                    OnAreaStatusChanged?.Invoke(this, new AreaStatusChangeEventArgs<IdentifierType>(area, oldStatus, AreaStatus.Released));
+                }
+            }
+        }
         protected override void OnDeltaChanged()
         {
             base.OnDeltaChanged();
@@ -49,7 +62,7 @@ namespace RemoteX.Sketch.InputComponent
                     {
                         //AreaStatusDict[area] = AreaStatus.Pressed;
                         area.Status = AreaStatus.Pressed;
-                        OnAreaStatusChanged?.Invoke(this, new AreaStatusChangeEventArgs(area, oldStatus, AreaStatus.Pressed));
+                        OnAreaStatusChanged?.Invoke(this, new AreaStatusChangeEventArgs<IdentifierType>(area, oldStatus, AreaStatus.Pressed));
                     }
                 }
                 else
@@ -59,20 +72,20 @@ namespace RemoteX.Sketch.InputComponent
                     {
                         //AreaStatusDict[area] = AreaStatus.Released;
                         area.Status = AreaStatus.Released;
-                        OnAreaStatusChanged?.Invoke(this, new AreaStatusChangeEventArgs(area, oldStatus, AreaStatus.Released));
+                        OnAreaStatusChanged?.Invoke(this, new AreaStatusChangeEventArgs<IdentifierType>(area, oldStatus, AreaStatus.Released));
                     }
                 }
             }
         }
 
         public enum AreaStatus { Released = 0, Pressed = 1 }
-        public class Area
+        public class Area<T> where T:IEquatable<T>
         {
             public float StartRadian { get; }
             public float EndRadian { get; }
             public float StartLength { get; }
             public float EndLength { get; }
-            public string AreaName { get; set; }
+            public T AreaIdentifier { get; set; }
             public AreaStatus Status { get; internal set; }
 
             public float StandardizedStartRadian
@@ -91,16 +104,16 @@ namespace RemoteX.Sketch.InputComponent
                 }
             }
             public float StandardizeEndRadian { get; }
-            public Area(string areaName, float startRadian, float endRadian, float startLength, float endLength)
+            public Area(T areaIdentifier, float startRadian, float endRadian, float startLength, float endLength)
             {
-                AreaName = areaName;
+                AreaIdentifier = areaIdentifier;
                 StartRadian = startRadian;
                 EndRadian = endRadian;
                 StartLength = startLength;
                 EndLength = endLength;
             }
 
-            public bool IsInArea(AreaJoystick areaJoystick, Vector2 delta)
+            public bool IsInArea(AreaJoystick<T> areaJoystick, Vector2 delta)
             {
                 if (delta.X == 0 && delta.Y == 0)
                 {
@@ -137,18 +150,18 @@ namespace RemoteX.Sketch.InputComponent
                 return (float)standarizeRadian;
             }
 
-            public static Area CreateFromAngle(string areaName, float startAngle, float endAngle, float startLength, float endLength)
+            public static Area<IdentifierType> CreateFromAngle(IdentifierType areaIdentifier, float startAngle, float endAngle, float startLength, float endLength)
             {
-                return new Area(areaName, (float)(startAngle * Math.PI / 180), (float)(endAngle * Math.PI / 180), startLength, endLength);
+                return new Area<IdentifierType>(areaIdentifier, (float)(startAngle * Math.PI / 180), (float)(endAngle * Math.PI / 180), startLength, endLength);
             }
         }
 
-        public class AreaStatusChangeEventArgs:EventArgs
+        public class AreaStatusChangeEventArgs<T> :EventArgs where T:IEquatable<T>
         {
-            public Area Area { get; }
+            public Area<T> Area { get; }
             public AreaStatus OldStatus { get; }
             public AreaStatus NewStatus { get; }
-            public AreaStatusChangeEventArgs(Area area, AreaStatus oldStatus, AreaStatus newStatus) : base()
+            public AreaStatusChangeEventArgs(Area<T> area, AreaStatus oldStatus, AreaStatus newStatus) : base()
             {
                 Area = area;
                 OldStatus = oldStatus;

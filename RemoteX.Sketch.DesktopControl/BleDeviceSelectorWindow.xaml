@@ -17,8 +17,8 @@
             <RowDefinition/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="Selector"/>
-        <ListView x:Name="DeviceListView" Grid.Row="1">
+        <TextBlock x:Name="MsgTextBlock" Grid.Row="0" Text="Selector"/>
+        <ListView x:Name="DeviceListView" Grid.Row="1" SelectedValuePath="{Binding Path=BluetoothDevice}" SelectionMode="Single" SelectionChanged="DeviceListView_SelectionChanged">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Margin="5">
@@ -29,7 +29,7 @@
             </ListView.ItemTemplate>
         </ListView>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="ConnectButton" Content="Connect" Margin="5" Padding="5" Click="ConnectButton_Click"/>
+            <Button x:Name="ConnectButton" Content="Connect" Margin="5" Padding="5" Click="ConnectButton_Click" IsEnabled="False"/>
             <Button x:Name="Rescan" Content="Rescan" Margin="5" Padding="5"/>
         </StackPanel>
     </Grid>

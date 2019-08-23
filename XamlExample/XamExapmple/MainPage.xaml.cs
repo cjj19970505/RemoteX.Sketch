@@ -55,6 +55,7 @@ namespace RemoteX.Sketch.XamExapmple
             
             
             Sketch.SketchEngine.Instantiate<GridRenderer>();
+            
             //Sketch.SketchEngine.Instantiate<PointerInfoBoard>();
             Sketch.SkiaManager.BeforePaint += SkiaManager_BeforePaint;
             ManagerManager = DependencyService.Get<IManagerManager>();
@@ -68,24 +69,25 @@ namespace RemoteX.Sketch.XamExapmple
             joystick.RectTransform.OffsetMin = new Vector2(10, 10);
             joystick.Level = 2;
 
-            var joystick2 = Sketch.SketchEngine.Instantiate<LineAreaJoystick>();
-            joystick2.RectTransform.AnchorMax = new Vector2(1, 1);
-            joystick2.RectTransform.AnchorMin = new Vector2(0, 0);
+            var joystick2 = Sketch.SketchEngine.Instantiate<LineAreaJoystick<byte>>();
+            joystick2.RectTransform.AnchorMax = new Vector2(0.5f, 0.5f);
+            joystick2.RectTransform.AnchorMin = new Vector2(0, 0.5f);
             joystick2.RectTransform.OffsetMax = new Vector2(-200, -200);
-            joystick2.RectTransform.OffsetMin = new Vector2(200, 200);
+            joystick2.RectTransform.OffsetMin = new Vector2(100, 100);
             joystick2.Level = 3;
 
-            joystick2.AddArea(AreaJoystick.Area.CreateFromAngle("d", -60, 60, 0, 1f));
-            joystick2.AddArea(AreaJoystick.Area.CreateFromAngle("w", 30, 150, 0, 1f));
-            joystick2.AddArea(AreaJoystick.Area.CreateFromAngle("a", 120, 240, 0, 1f));
-            joystick2.AddArea(AreaJoystick.Area.CreateFromAngle("s", 210, 330, 0, 1f));
-            joystick2.AddArea(AreaJoystick.Area.CreateFromAngle("shift", 0, 360, 0.7f, 1f));
+            joystick2.AddArea(AreaJoystick<byte>.Area<byte>.CreateFromAngle((byte)VirtualKeyCode.VK_D, -60, 60, 0, float.PositiveInfinity));
+            joystick2.AddArea(AreaJoystick<byte>.Area<byte>.CreateFromAngle((byte)VirtualKeyCode.VK_W, 30, 150, 0, float.PositiveInfinity));
+            joystick2.AddArea(AreaJoystick<byte>.Area<byte>.CreateFromAngle((byte)VirtualKeyCode.VK_A, 120, 240, 0, float.PositiveInfinity));
+            joystick2.AddArea(AreaJoystick<byte>.Area<byte>.CreateFromAngle((byte)VirtualKeyCode.VK_S, 210, 330, 0, float.PositiveInfinity));
+            joystick2.AddArea(AreaJoystick<byte>.Area<byte>.CreateFromAngle((byte)VirtualKeyCode.LSHIFT, 0, 360, 0.7f, float.PositiveInfinity));
 
             joystick2.OnAreaStatusChanged += Joystick2_OnAreaStatusChanged;
             ExampleSketchObject = Sketch.SketchEngine.Instantiate<ExampleSketchObject>();
+            Sketch.SketchEngine.Instantiate<SketchBorderRenderer>();
             CanvasView.InvalidateSurface();
             ExampleSketchObject.Position = new SKPoint(Sketch.Width/2, Sketch.Height/2);
-            SensorSpeed speed = SensorSpeed.Fastest;
+            SensorSpeed speed = SensorSpeed.Game;
             
             Gyroscope.ReadingChanged += Gyroscope_ReadingChanged;
             Gyroscope.Start(speed);
@@ -93,30 +95,9 @@ namespace RemoteX.Sketch.XamExapmple
             Device.StartTimer(TimeSpan.FromSeconds(1 / 60f), () => { CanvasView.InvalidateSurface(); return !true; });
         }
 
-        private void Joystick2_OnAreaStatusChanged(object sender, AreaJoystick.AreaStatusChangeEventArgs e)
+        private void Joystick2_OnAreaStatusChanged(object sender, AreaJoystick<byte>.AreaStatusChangeEventArgs<byte> e)
         {
-            byte keyCode = 0;
-            if(e.Area.AreaName == "w")
-            {
-                keyCode = (byte)'w';
-            }
-            else if(e.Area.AreaName == "a")
-            {
-                keyCode = (byte)'a';
-            }
-            else if (e.Area.AreaName == "s")
-            {
-                keyCode = (byte)'s';
-            }
-            else if (e.Area.AreaName == "d")
-            {
-                keyCode = (byte)'d';
-            }
-            if(keyCode == 0)
-            {
-                return;
-            }
-            KeyboardServiceWrapper.UpdateKeyStatus(keyCode, (KeyStatus)e.NewStatus);
+            KeyboardServiceWrapper.UpdateKeyStatus(e.Area.AreaIdentifier, (KeyStatus)e.NewStatus);
         }
 
         private void GyroRfcommServiceProvider_OnConnectionReceived(object sender, IRfcommConnection e)
@@ -133,10 +114,12 @@ namespace RemoteX.Sketch.XamExapmple
                 return;
             }
             var timeSpan = (DateTime.Now - _PreviousReadDateTime).TotalMilliseconds;
+            /*
             if(timeSpan < 1000.0/40)
             {
                 return;
             }
+            */
             _PreviousReadDateTime = DateTime.Now;
             var delta = new SKPoint(e.Reading.AngularVelocity.X*10, e.Reading.AngularVelocity.Y*10);
             ExampleSketchObject.Position = ExampleSketchObject.Position + delta;
@@ -148,19 +131,32 @@ namespace RemoteX.Sketch.XamExapmple
             var skiaManager = sender as SkiaManager;
             SKMatrix.MakeTranslation(0, e.LocalClipBounds.Height);
             var matrix = skiaManager.SketchSpaceToCanvasSpaceMatrix;
-            Sketch.Width = e.LocalClipBounds.Width;
-            Sketch.Height = e.LocalClipBounds.Height;
+            Sketch.Width = 1600;
+            Sketch.Height = 900;
             
             SKPoint sketchSize = new SKPoint(Sketch.Width, Sketch.Height);
             
             //matrix.SetScaleTranslate(1f, -1f, e.LocalClipBounds.Width / 2, e.LocalClipBounds.Height / 2);
-            var factor = e.LocalClipBounds.Width / sketchSize.X;
-            matrix.SetScaleTranslate(e.LocalClipBounds.Width/sketchSize.X, -e.LocalClipBounds.Height/sketchSize.Y, 0, e.LocalClipBounds.Height);
-            skiaManager.SketchSpaceToCanvasSpaceMatrix = matrix;
             
-            //float baseDpi = 96;
+            var sketchRatio = sketchSize.X / sketchSize.Y;
+            var localClipRatio = e.LocalClipBounds.Width / e.LocalClipBounds.Height;
+            var xFactor = e.LocalClipBounds.Width / sketchSize.X;
+            var yFactor = e.LocalClipBounds.Height / sketchSize.Y;
+            if (localClipRatio > sketchRatio)
+            {
+                xFactor = yFactor;
+            }
+            else
+            {
+                yFactor = xFactor;
+            }
+            var xTranslate = e.LocalClipBounds.MidX - (xFactor * sketchSize.X) / 2;
+            var yTranslate = e.LocalClipBounds.Height - (e.LocalClipBounds.MidY - (yFactor * sketchSize.Y) / 2);
+            matrix.SetScaleTranslate(xFactor, -yFactor, xTranslate, yTranslate);
+            skiaManager.SketchSpaceToCanvasSpaceMatrix = matrix;
+
             Matrix3x2 epxToPx = Matrix3x2.CreateScale(1);
-            Matrix3x2 pxToSketchSpace = Matrix3x2.Multiply(Matrix3x2.CreateTranslation(0, -e.LocalClipBounds.Height), Matrix3x2.CreateScale(sketchSize.X/e.LocalClipBounds.Width, -sketchSize.Y / e.LocalClipBounds.Height));
+            Matrix3x2 pxToSketchSpace = Matrix3x2.Multiply(Matrix3x2.CreateTranslation(-xTranslate, -yTranslate), Matrix3x2.CreateScale(1/xFactor, -1/yFactor));
             SketchInputManager.InputSpaceToSketchSpaceMatrix = Matrix3x2.Multiply(epxToPx, pxToSketchSpace);
         }
 

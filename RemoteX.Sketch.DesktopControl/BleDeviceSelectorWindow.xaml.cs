@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using RemoteX.Bluetooth.Procedure.Client;
+using RemoteX.Bluetooth.Rfcomm;
 
 namespace RemoteX.Sketch.DesktopControl
 {
@@ -26,6 +27,8 @@ namespace RemoteX.Sketch.DesktopControl
         public IBluetoothManager BluetoothManager { get; }
         ObservableCollection<BleDeviceViewModel> ScanResultItemSource;
         public ConnectionProfile ConnectionProfile { get; }
+        public IBluetoothDevice SelectedDevice { get; private set; }
+        public ConnectionBuildResult ConnectionBuildResult { get; private set; }
         public BleDeviceSelectorWindow(IBluetoothManager bluetoothManager, ConnectionProfile connectionProfile)
         {
             BluetoothManager = bluetoothManager;
@@ -77,9 +80,34 @@ namespace RemoteX.Sketch.DesktopControl
             });
         }
 
-        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        private async void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if(BluetoothManager.LEScanner.Status == BluetoothLEScannerState.Started)
+            {
+                BluetoothManager.LEScanner.Stop();
+            }
+            if(BluetoothManager.RfcommScanner.Status == BluetoothRfcommScannerState.Started)
+            {
+                BluetoothManager.RfcommScanner.Stop();
+            }
+            ConnectionBuilder connectionBuilder = new ConnectionBuilder(BluetoothManager, ConnectionProfile, SelectedDevice);
+            try
+            {
+                var result = await connectionBuilder.StartAsync();
+                ConnectionBuildResult = result;
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    Close();
+                });
+            }
+            catch(Exception exception)
+            {
+                BluetoothManager.LEScanner.Start();
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    MsgTextBlock.Text = exception.Message;
+                });
+            }
         }
 
         private BleDeviceViewModel _GetViewModelFromDevice(IBluetoothDevice bluetoothDevice)
@@ -92,6 +120,21 @@ namespace RemoteX.Sketch.DesktopControl
                 }
             }
             return null;
+        }
+
+        private void DeviceListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(e.AddedItems.Count > 0)
+            {
+                SelectedDevice = (e.AddedItems[0] as BleDeviceViewModel).BluetoothDevice;
+                ConnectButton.IsEnabled = true;
+            }
+            else
+            {
+                SelectedDevice = null;
+                ConnectButton.IsEnabled = false;
+            }
+            
         }
     }
 

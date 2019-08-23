@@ -7,7 +7,7 @@ using System.Text;
 
 namespace RemoteX.Sketch.InputComponent
 {
-    public class LineAreaJoystick:AreaJoystick, ISkiaRenderer
+    public class LineAreaJoystick<T>:AreaJoystick<T>, ISkiaRenderer where T:IEquatable<T>
     {
         public LineAreaJoystick():base()
         {
@@ -72,7 +72,7 @@ namespace RemoteX.Sketch.InputComponent
                 {
                     if (area.Status == AreaStatus.Pressed)
                     {
-                        sb.Append(area.AreaName + ", ");
+                        sb.Append(area.AreaIdentifier + ", ");
                     }
                 }
                 
