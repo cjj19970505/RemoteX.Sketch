@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteX.Sketch.Editor", "Re
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteX.Sketch.Bluetooth", "RemoteX.Sketch.Bluetooth\RemoteX.Sketch.Bluetooth.csproj", "{09886ABA-676A-49C0-92E8-F0530662111C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteX.Sketch.DesktopControl", "RemoteX.Sketch.DesktopControl\RemoteX.Sketch.DesktopControl.csproj", "{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -317,6 +319,26 @@ Global
 		{09886ABA-676A-49C0-92E8-F0530662111C}.Release|x64.Build.0 = Release|Any CPU
 		{09886ABA-676A-49C0-92E8-F0530662111C}.Release|x86.ActiveCfg = Release|Any CPU
 		{09886ABA-676A-49C0-92E8-F0530662111C}.Release|x86.Build.0 = Release|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Debug|ARM.Build.0 = Debug|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Debug|x64.Build.0 = Debug|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Debug|x86.Build.0 = Debug|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Release|ARM.ActiveCfg = Release|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Release|ARM.Build.0 = Release|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Release|ARM64.Build.0 = Release|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Release|x64.ActiveCfg = Release|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Release|x64.Build.0 = Release|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Release|x86.ActiveCfg = Release|Any CPU
+		{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

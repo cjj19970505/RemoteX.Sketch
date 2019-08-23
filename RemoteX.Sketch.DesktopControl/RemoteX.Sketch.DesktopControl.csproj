@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F63ABBAB-79C4-4F5A-93E4-18DD784A795A}</ProjectGuid>
+    <ProjectGuid>{4F5FFA18-0AA6-4768-B89A-25F2C4A9653D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>RemoteX.Sketch.DesktopControl</RootNamespace>
     <AssemblyName>RemoteX.Sketch.DesktopControl</AssemblyName>
@@ -14,6 +14,8 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,6 +37,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RemoteX.Bluetooth, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RemoteX.Bluetooth.1.0.8\lib\netstandard2.0\RemoteX.Bluetooth.dll</HintPath>
+    </Reference>
+    <Reference Include="RemoteX.Bluetooth.Procedure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RemoteX.Bluetooth.Procedure.1.0.0\lib\netstandard2.0\RemoteX.Bluetooth.Procedure.dll</HintPath>
+    </Reference>
+    <Reference Include="RemoteX.Bluetooth.Win10Framework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RemoteX.Bluetooth.Win10.1.0.8\lib\net45\RemoteX.Bluetooth.Win10Framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -46,15 +57,6 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="windows">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.17763.0\Facade\windows.winmd</HintPath>
-    </Reference>
-    <Reference Include="Windows.Foundation.FoundationContract">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\References\10.0.17763.0\Windows.Foundation.FoundationContract\3.0.0.0\Windows.Foundation.FoundationContract.winmd</HintPath>
-    </Reference>
-    <Reference Include="Windows.Foundation.UniversalApiContract">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\References\10.0.17763.0\Windows.Foundation.UniversalApiContract\7.0.0.0\Windows.Foundation.UniversalApiContract.winmd</HintPath>
-    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -64,7 +66,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="BleDeviceSelector.xaml">
+    <Page Include="BleDeviceSelectorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -76,8 +78,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BleDeviceSelector.xaml.cs">
-      <DependentUpon>BleDeviceSelector.xaml</DependentUpon>
+    <Compile Include="BleDeviceSelectorWindow.xaml.cs">
+      <DependentUpon>BleDeviceSelectorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MacAddressUlongToStringConverter.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -103,6 +105,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -110,17 +113,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="RemoteX.Bluetooth">
-      <Version>1.0.8</Version>
-    </PackageReference>
-    <PackageReference Include="RemoteX.Bluetooth.Procedure">
-      <Version>1.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="RemoteX.Bluetooth.Win10">
-      <Version>1.0.7</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

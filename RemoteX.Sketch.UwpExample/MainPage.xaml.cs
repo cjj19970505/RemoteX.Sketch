@@ -57,7 +57,7 @@ namespace RemoteX.Sketch.UwpExample
             Sketch.SkiaManager.Init(SKCanvasView.Invalidate, SKMatrix.MakeScale(1, -1));
             System.Diagnostics.Debug.WriteLine("MainPageThread:" + Thread.CurrentThread.ManagedThreadId);
 
-            BluetoothManager = new BluetoothManager(this.Dispatcher);
+            BluetoothManager = new BluetoothManager();
 
             ExampleSketchObject = Sketch.SketchEngine.Instantiate<ExampleSketchObject>();
             Sketch.SketchEngine.Instantiate<GridRenderer>();
@@ -89,12 +89,12 @@ namespace RemoteX.Sketch.UwpExample
 
             
             var characteristicDict = new Dictionary<Guid, List<CharacteristicProfile>>();
-            characteristicDict.Add(BatteryServiceWrapper.BATTERY_SERVICE_UUID, new List<CharacteristicProfile>()
+            characteristicDict.Add(KeyboardServiceWrapper.Guid, new List<CharacteristicProfile>()
             {
                 new CharacteristicProfile
                 {
                     Notified = true,
-                    Guid = BatteryLevelCharacteristicWrapper.BATTERY_LEVEL_UUID
+                    Guid = Constants.KeyActionCharacteristicWrapper
                 }
             });
             var serviceId = new List<Guid>

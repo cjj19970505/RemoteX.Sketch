@@ -1,4 +1,4 @@
-﻿using RemoteX.Bluetooth;
+﻿using RemoteX.Bluetooth.Procedure.Client;
 using RemoteX.Bluetooth.Win10;
 using System;
 using System.Collections.Generic;
@@ -22,14 +22,12 @@ namespace RemoteX.Sketch.DesktopControl
     /// </summary>
     public partial class MainWindow : Window
     {
-        public IBluetoothManager BluetoothManager { get; }
         public MainWindow()
         {
-            System.Diagnostics.Debug.WriteLine("FUCK");
             InitializeComponent();
-            BluetoothManager = new BluetoothManager();
-            //BleDeviceSelector bleDeviceSelector = new BleDeviceSelector(BluetoothManager);
-            //bleDeviceSelector.ShowDialog();
+            BluetoothManager bluetoothManager = new BluetoothManager();
+            BleDeviceSelectorWindow bleDeviceSelectorWindow = new BleDeviceSelectorWindow(bluetoothManager, new ConnectionProfile());
+            bleDeviceSelectorWindow.ShowDialog();
         }
     }
 }
