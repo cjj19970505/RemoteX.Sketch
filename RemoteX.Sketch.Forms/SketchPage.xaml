@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:forms="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
+             mc:Ignorable="d"
+             x:Class="RemoteX.Sketch.Forms.SketchPage">
+    <ContentPage.Content>
+        <AbsoluteLayout x:Name="DefaultLayout">
+            <forms:SKCanvasView x:Name="CanvasView" PaintSurface="CanvasView_PaintSurface" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"/>
+        </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>

@@ -14,13 +14,14 @@
     <PackageReference Include="RemoteX.Bluetooth" Version="1.0.8" />
     <PackageReference Include="RemoteX.Bluetooth.Procedure" Version="1.0.0" />
     <PackageReference Include="SkiaSharp.Views.Forms" Version="1.68.0" />
-    <PackageReference Include="Xamarin.Forms" Version="3.6.0.344457" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.1.0" />
+    <PackageReference Include="Xamarin.Forms" Version="4.2.0.709249" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\RemoteX.Input\RemoteX.Input.csproj" />
     <ProjectReference Include="..\..\RemoteX.Sketch.Bluetooth\RemoteX.Sketch.Bluetooth.csproj" />
+    <ProjectReference Include="..\..\RemoteX.Sketch.Forms\RemoteX.Sketch.Forms.csproj" />
     <ProjectReference Include="..\..\RemoteX.Sketch\RemoteX.Sketch.csproj" />
   </ItemGroup>
 </Project>

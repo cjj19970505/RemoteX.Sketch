@@ -1,5 +1,6 @@
 ﻿using RemoteX.Sketch.CoreModule;
 using RemoteX.Sketch.Skia;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -85,12 +86,36 @@ namespace RemoteX.Sketch
         }
 
     }
-    public class SketchInfo : SketchObject
+    public class SketchInfo : SketchObject, ISkiaRenderer
     {
         public Sketch Sketch { get; private set; }
+        public event EventHandler OnUpdated;
+        public event EventHandler<OnDrawEventArgs> OnDraw;
         public void Init(Sketch sketch)
         {
             Sketch = sketch;
+        }
+
+        public void PaintSurface(SkiaManager skiaManager, SKCanvas canvas)
+        {
+            OnDraw?.Invoke(this, new OnDrawEventArgs(skiaManager, canvas));
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            OnUpdated?.Invoke(this, null);
+        }
+
+        public class OnDrawEventArgs:EventArgs
+        {
+            public SkiaManager SkiaManager { get; }
+            public SKCanvas SKCanvas { get; }
+            public OnDrawEventArgs(SkiaManager skiaManager, SKCanvas canvas)
+            {
+                SkiaManager = skiaManager;
+                SKCanvas = canvas;
+            }
         }
     }
 }

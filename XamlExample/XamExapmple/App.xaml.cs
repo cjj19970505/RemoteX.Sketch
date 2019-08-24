@@ -9,8 +9,8 @@ namespace RemoteX.Sketch.XamExapmple
         public App()
         {
             InitializeComponent();
-
-            MainPage = new MainPage();
+            var managerManager = DependencyService.Get<IManagerManager>();
+            MainPage = new SketchTest(managerManager.InputManager);
         }
 
         protected override void OnStart()

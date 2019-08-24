@@ -24,7 +24,6 @@ namespace RemoteX.Sketch
         public void PaintSurface(SkiaManager skiaManager, SKCanvas canvas)
         {
             var sketchInputManager = SketchEngine.FindObjectByType<SketchInputManager>();
-            canvas.DrawRect(0, 0, 200, 200, _BoardPaint);
             foreach(var pointer in sketchInputManager.SketchPointers)
             {
                 //Vector2 pos = Vector2.Transform(pointer.Point, skiaManager.SketchSpaceToCanvasSpaceMatrix);
