@@ -56,24 +56,27 @@ namespace RemoteX.Sketch.XamExapmple
             
             Sketch.SketchEngine.Instantiate<GridRenderer>();
             
-            //Sketch.SketchEngine.Instantiate<PointerInfoBoard>();
+            Sketch.SketchEngine.Instantiate<PointerInfoBoard>();
             Sketch.SkiaManager.BeforePaint += SkiaManager_BeforePaint;
             ManagerManager = DependencyService.Get<IManagerManager>();
             SketchInputManager = Sketch.SketchEngine.Instantiate<SketchInputManager>();
             Sketch.Start();
             SketchInputManager.Init(ManagerManager.InputManager);
+            
+            /*
             var joystick = Sketch.SketchEngine.Instantiate<ColorJoystick>();
             joystick.RectTransform.AnchorMax = new Vector2(1, 1);
             joystick.RectTransform.AnchorMin = new Vector2(0, 0);
             joystick.RectTransform.OffsetMax = new Vector2(-800, -800);
             joystick.RectTransform.OffsetMin = new Vector2(10, 10);
             joystick.Level = 2;
+            */
 
             var joystick2 = Sketch.SketchEngine.Instantiate<LineAreaJoystick<byte>>();
-            joystick2.RectTransform.AnchorMax = new Vector2(0.5f, 0.5f);
-            joystick2.RectTransform.AnchorMin = new Vector2(0, 0.5f);
-            joystick2.RectTransform.OffsetMax = new Vector2(-200, -200);
-            joystick2.RectTransform.OffsetMin = new Vector2(100, 100);
+            joystick2.RectTransform.AnchorMax = new Vector2(0, 0);
+            joystick2.RectTransform.AnchorMin = new Vector2(0, 0);
+            joystick2.RectTransform.OffsetMax = new Vector2(600, 600);
+            joystick2.RectTransform.OffsetMin = new Vector2(500, 500);
             joystick2.Level = 3;
 
             joystick2.AddArea(AreaJoystick<byte>.Area<byte>.CreateFromAngle((byte)VirtualKeyCode.VK_D, -60, 60, 0, float.PositiveInfinity));
@@ -81,10 +84,18 @@ namespace RemoteX.Sketch.XamExapmple
             joystick2.AddArea(AreaJoystick<byte>.Area<byte>.CreateFromAngle((byte)VirtualKeyCode.VK_A, 120, 240, 0, float.PositiveInfinity));
             joystick2.AddArea(AreaJoystick<byte>.Area<byte>.CreateFromAngle((byte)VirtualKeyCode.VK_S, 210, 330, 0, float.PositiveInfinity));
             joystick2.AddArea(AreaJoystick<byte>.Area<byte>.CreateFromAngle((byte)VirtualKeyCode.LSHIFT, 0, 360, 0.7f, float.PositiveInfinity));
-
             joystick2.OnAreaStatusChanged += Joystick2_OnAreaStatusChanged;
+
+            var keyboardButton = Sketch.SketchEngine.Instantiate<KeyboardKeyButton>();
+            keyboardButton.RectTransform.AnchorMax = new Vector2(0, 0);
+            keyboardButton.RectTransform.AnchorMin = new Vector2(0, 0);
+            keyboardButton.RectTransform.OffsetMin = new Vector2(50, 50);
+            keyboardButton.RectTransform.OffsetMax = new Vector2(150, 150);
+            keyboardButton.Level = 2;
             ExampleSketchObject = Sketch.SketchEngine.Instantiate<ExampleSketchObject>();
             Sketch.SketchEngine.Instantiate<SketchBorderRenderer>();
+            Sketch.SketchEngine.Instantiate<RectTransformFrameRenderer>();
+
             CanvasView.InvalidateSurface();
             ExampleSketchObject.Position = new SKPoint(Sketch.Width/2, Sketch.Height/2);
             SensorSpeed speed = SensorSpeed.Game;

@@ -42,7 +42,17 @@ namespace RemoteX.Sketch.InputComponent
         };
         public void PaintSurface(SkiaManager skiaManager, SKCanvas canvas)
         {
+            var rectTransformSKRectInCanvas = skiaManager.SketchSpaceToCanvasSpaceMatrix.MapRect(RectTransform.Rect.ToSKRect());
+            if(Pressed)
+            {
+                canvas.DrawRect(rectTransformSKRectInCanvas, PressedPaint);
+            }
+            else
+            {
+                canvas.DrawRect(rectTransformSKRectInCanvas, ReleasedPaint);
+            }
             
+
         }
     }
 }

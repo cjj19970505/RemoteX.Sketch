@@ -6,7 +6,7 @@ using System.Text;
 
 namespace RemoteX.Sketch.InputComponent
 {
-    public abstract class Joystick : SketchObject, IInputComponent
+    public abstract class Joystick : SketchObject, IInputComponent, IRectTransformable
     {
         public int Level { get; set; }
         public virtual IArea StartRegion { get; }

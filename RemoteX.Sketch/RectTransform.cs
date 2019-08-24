@@ -35,8 +35,11 @@ namespace RemoteX.Sketch
                 Vector2 minCorner = denormalizedAnchorMin + OffsetMin;
                 return (minCorner, maxCorner);
             }
-        }
+        } 
+    }
 
-        
+    public interface IRectTransformable
+    {
+        RectTransform RectTransform { get; }
     }
 }
