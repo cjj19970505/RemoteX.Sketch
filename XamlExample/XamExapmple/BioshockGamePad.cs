@@ -17,6 +17,7 @@ namespace RemoteX.Sketch.XamExapmple
     {
         AreaJoystick<VirtualKeyCode> LeftStick;
         AreaJoystick<VirtualKeyCode> DirectionPad;
+        TouchpadJoystick RightStick;
         ControllerButton XButton;
         ControllerButton YButton;
         ControllerButton AButton;
@@ -97,10 +98,24 @@ namespace RemoteX.Sketch.XamExapmple
             DirectionPad.RectTransform.OffsetMin = new Vector2(73f, -842f);
             DirectionPad.RectTransform.OffsetMax = new Vector2(423f, -492f);
 
+            RightStick = Sketch.SketchEngine.Instantiate<TouchpadJoystick>();
+            RightStick.OnMove += RightStick_OnMove;
+            RightStick.RectTransform.AnchorMax = new Vector2(0f, 1f);
+            RightStick.RectTransform.AnchorMin = new Vector2(0f, 1f);
+            RightStick.RectTransform.OffsetMin = new Vector2(1177.8f, -842f);
+            RightStick.RectTransform.OffsetMax = new Vector2(1527.8f, -492f);
+            RightStick.Level = 3;
+            
+
             Sketch.SketchEngine.Instantiate<SketchBorderRenderer>();
             Sketch.SketchEngine.Instantiate<RectTransformFrameRenderer>();
 
             
+        }
+
+        private void RightStick_OnMove(object sender, Vector2 e)
+        {
+            System.Diagnostics.Debug.WriteLine(e);
         }
 
         private void GyroRfcommServiceProvider_OnConnectionReceived(object sender, IRfcommConnection e)
