@@ -49,6 +49,12 @@ namespace RemoteX.Sketch.InputComponent
             PreviousDelta = Delta;
             OnMove?.Invoke(this, LatestMoveAmount);
         }
+        protected override void OnJoystickUp()
+        {
+            base.OnJoystickUp();
+            LatestMoveAmount = Vector2.Zero;
+            PreviousDelta = Vector2.Zero;
+        }
 
         public void PaintSurface(SkiaManager skiaManager, SKCanvas canvas)
         {

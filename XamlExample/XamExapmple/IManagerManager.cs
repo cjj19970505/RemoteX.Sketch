@@ -10,5 +10,6 @@ namespace RemoteX.Sketch.XamExapmple
     {
         IBluetoothManager BluetoothManager { get; }
         IInputManager InputManager { get; }
+        IKeyManager KeyManager { get; }
     }
 }

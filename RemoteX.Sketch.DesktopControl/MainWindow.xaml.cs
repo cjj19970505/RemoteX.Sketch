@@ -29,8 +29,11 @@ namespace RemoteX.Sketch.DesktopControl
         Guid GyroscopeReadingUuid;
         Guid KeyboardServiceUuid;
         Guid KeyboardCharacteristicUuid;
+        Guid MouseServiceUuid;
+        Guid MouseCharacteristicUuid;
         ConnectionBuildResult ConnectionBuildResult;
         GyroscopeRfcommServiceConnectionWrapper GyroscopeRfcommServiceConnectionWrapper;
+        MouseServiceWrapper MouseServiceWrapper;
         KeyboardServiceClientWrapper KeyboardServiceClientWrapper;
         AutoHotkeyEngine Ahk { get; }
         InputSimulator InputSimulator;
@@ -44,6 +47,8 @@ namespace RemoteX.Sketch.DesktopControl
             BluetoothManager bluetoothManager = new BluetoothManager();
             GyroscopeReadingUuid = GyroscopeRfcommServiceConnectionWrapper.RfcommServiceId;
             KeyboardServiceUuid = Constants.KeyboardServiceGuid;
+            MouseServiceUuid = Constants.MouseServiceId;
+            MouseCharacteristicUuid = Constants.MouseActionCharacteristicWrapper;
             KeyboardCharacteristicUuid = Constants.KeyActionCharacteristicWrapper;
 
             var characteristicDict = new Dictionary<Guid, List<CharacteristicProfile>>();
@@ -53,11 +58,16 @@ namespace RemoteX.Sketch.DesktopControl
                 {
                     Notified = true,
                     Guid = Constants.KeyActionCharacteristicWrapper
+                },
+                new CharacteristicProfile
+                {
+                    Notified = true,
+                    Guid = Constants.MouseActionCharacteristicWrapper
                 }
             });
             var serviceId = new List<Guid>
             {
-                GyroscopeRfcommServiceConnectionWrapper.RfcommServiceId
+                MouseServiceWrapper.ServiceId
             };
             ConnectionProfile profile = new ConnectionProfile()
             {
@@ -68,10 +78,45 @@ namespace RemoteX.Sketch.DesktopControl
             BleDeviceSelectorWindow bleDeviceSelectorWindow = new BleDeviceSelectorWindow(bluetoothManager, profile);
             bleDeviceSelectorWindow.ShowDialog();
             ConnectionBuildResult = bleDeviceSelectorWindow.ConnectionBuildResult;
-            GyroscopeRfcommServiceConnectionWrapper = new GyroscopeRfcommServiceConnectionWrapper(ConnectionBuildResult[GyroscopeReadingUuid].RfcommConnection);
-            GyroscopeRfcommServiceConnectionWrapper.OnReadingUpdated += GyroscopeRfcommServiceConnectionWrapper_OnReadingUpdated;
-            KeyboardServiceClientWrapper = new KeyboardServiceClientWrapper(ConnectionBuildResult[KeyboardServiceUuid, KeyboardCharacteristicUuid]);
+            MouseServiceWrapper = new MouseServiceWrapper(ConnectionBuildResult[MouseServiceUuid].RfcommConnection);
+            MouseServiceWrapper.OnMouseMoveReceived += MouseServiceWrapper_OnMouseMoveReceived;
+            KeyboardServiceClientWrapper = new KeyboardServiceClientWrapper(ConnectionBuildResult[KeyboardServiceUuid, KeyboardCharacteristicUuid], ConnectionBuildResult[KeyboardServiceUuid, MouseCharacteristicUuid]);
             KeyboardServiceClientWrapper.OnKeyStatusChanged += KeyboardServiceClientWrapper_OnKeyStatusChanged;
+            KeyboardServiceClientWrapper.OnMouseStatusChanged += KeyboardServiceClientWrapper_OnMouseStatusChanged;
+        }
+
+        private void KeyboardServiceClientWrapper_OnMouseStatusChanged(object sender, KeyboardServiceClientWrapper.MouseStatusChangeEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine(e.MouseButton + ", " + e.NewStatus);
+            if(e.MouseButton == 0)
+            {
+                if(e.NewStatus == 0)
+                {
+                    InputSimulator.Mouse.LeftButtonDown();
+                }
+                else
+                {
+                    InputSimulator.Mouse.LeftButtonUp();
+                }
+            }
+            else if(e.MouseButton == 1)
+            {
+                if (e.NewStatus == 0)
+                {
+                    InputSimulator.Mouse.RightButtonDown();
+                }
+                else
+                {
+                    InputSimulator.Mouse.RightButtonUp();
+                }
+            }
+        }
+
+        private void MouseServiceWrapper_OnMouseMoveReceived(object sender, Vector2 e)
+        {
+            int dX = -(int)(e.X * 20);
+            int dY = (int)(e.Y * 20);
+            InputSimulator.Mouse.MoveMouseBy(dX, dY);
         }
 
         private void KeyboardServiceClientWrapper_OnKeyStatusChanged(object sender, KeyboardServiceClientWrapper.KeyStatusChangeEventArgs e)

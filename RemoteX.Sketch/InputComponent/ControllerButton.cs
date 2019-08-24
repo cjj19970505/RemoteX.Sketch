@@ -9,6 +9,8 @@ namespace RemoteX.Sketch.InputComponent
 {
     public class ControllerButton : Button, ISkiaRenderer
     {
+        public event EventHandler OnButtonDown;
+        public event EventHandler OnButtonUp;
         public override IArea StartRegion
         {
             get
@@ -51,6 +53,18 @@ namespace RemoteX.Sketch.InputComponent
             TextAlign = SKTextAlign.Center,
             Color = SKColors.Green
         };
+
+        public override void OnPressed()
+        {
+            base.OnPressed();
+            OnButtonDown?.Invoke(this, null);
+        }
+
+        public override void OnReleased()
+        {
+            base.OnReleased();
+            OnButtonUp?.Invoke(this, null);
+        }
 
         public void PaintSurface(SkiaManager skiaManager, SKCanvas canvas)
         {

@@ -108,7 +108,7 @@ namespace RemoteX.Sketch.XamExapmple
 
         private void Joystick2_OnAreaStatusChanged(object sender, AreaJoystick<byte>.AreaStatusChangeEventArgs<byte> e)
         {
-            KeyboardServiceWrapper.UpdateKeyStatus(e.Area.AreaIdentifier, (KeyStatus)e.NewStatus);
+            //KeyboardServiceWrapper.UpdateKeyStatus(e.Area.AreaIdentifier, (KeyStatus)e.NewStatus);
         }
 
         private void GyroRfcommServiceProvider_OnConnectionReceived(object sender, IRfcommConnection e)

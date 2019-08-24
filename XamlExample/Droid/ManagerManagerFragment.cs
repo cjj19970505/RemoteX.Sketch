@@ -53,6 +53,19 @@ namespace RemoteX.Sketch.XamExapmple.Droid
             Log.Info(TAG, "ON_START");
         }
 
+        private IKeyManager _KeyManager;
+        public IKeyManager KeyManager
+        {
+            get
+            {
+                if(_KeyManager == null)
+                {
+                    _KeyManager = new KeyManager();
+                }
+                return _KeyManager;
+            }
+        }
+
         
 
     }

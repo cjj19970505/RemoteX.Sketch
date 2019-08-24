@@ -45,8 +45,31 @@ namespace RemoteX.Sketch.XamExapmple.Droid
         {
             (ManagerManagerFragment.InputManager as RemoteX.Input.Droid.InputManager).OnTouch(ev);
             return base.DispatchTouchEvent(ev);
-            
+        }
 
+        public override bool OnKeyDown([GeneratedEnum] Keycode keyCode, KeyEvent e)
+        {
+            
+            if(e.RepeatCount == 0)
+            {
+                return (ManagerManagerFragment.KeyManager as KeyManager).OnActivityKeyDown(keyCode);
+            }
+            else
+            {
+                if(keyCode == Keycode.VolumeDown || keyCode == Keycode.VolumeUp)
+                {
+                    return true;
+                }
+                else
+                {
+                    return base.OnKeyDown(keyCode, e);
+                }
+            }
+        }
+
+        public override bool OnKeyUp([GeneratedEnum] Keycode keyCode, KeyEvent e)
+        {
+            return (ManagerManagerFragment.KeyManager as KeyManager).OnActivityKeyUp(keyCode);
         }
     }
 }

@@ -70,6 +70,7 @@
     <PackageReference Include="Xamarin.Essentials" Version="1.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KeyManager.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="ManagerManagerFragment.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
