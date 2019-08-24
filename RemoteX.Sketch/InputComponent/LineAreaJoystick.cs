@@ -7,7 +7,7 @@ using System.Text;
 
 namespace RemoteX.Sketch.InputComponent
 {
-    public class LineAreaJoystick<T>:AreaJoystick<T>, ISkiaRenderer where T:IEquatable<T>
+    public class LineAreaJoystick<T>:AreaJoystick<T>, ISkiaRenderer where T:IComparable
     {
         public LineAreaJoystick():base()
         {
@@ -36,7 +36,7 @@ namespace RemoteX.Sketch.InputComponent
         SKPaint MaxLengthAreaPaint = new SKPaint()
         {
             Color = SKColors.YellowGreen,
-            Style = SKPaintStyle.Fill
+            Style = SKPaintStyle.Stroke
         };
         SKPaint LinePaint = new SKPaint()
         {

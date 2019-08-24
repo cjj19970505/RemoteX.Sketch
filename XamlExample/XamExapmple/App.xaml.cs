@@ -10,7 +10,7 @@ namespace RemoteX.Sketch.XamExapmple
         {
             InitializeComponent();
             var managerManager = DependencyService.Get<IManagerManager>();
-            MainPage = new SketchTest(managerManager.InputManager);
+            MainPage = new BioshockGamePad(managerManager.InputManager);
         }
 
         protected override void OnStart()

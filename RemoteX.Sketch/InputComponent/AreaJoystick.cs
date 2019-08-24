@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RemoteX.Sketch.InputComponent
 {
-    public class AreaJoystick<IdentifierType> : Joystick where IdentifierType:IEquatable<IdentifierType>
+    public class AreaJoystick<IdentifierType> : Joystick where IdentifierType: IComparable
     {
         public event EventHandler<AreaStatusChangeEventArgs<IdentifierType>> OnAreaStatusChanged;
         protected List<Area<IdentifierType>> AreaList { get; }
@@ -79,7 +79,7 @@ namespace RemoteX.Sketch.InputComponent
         }
 
         public enum AreaStatus { Released = 0, Pressed = 1 }
-        public class Area<T> where T:IEquatable<T>
+        public class Area<T> where T: IComparable
         {
             public float StartRadian { get; }
             public float EndRadian { get; }
@@ -156,7 +156,7 @@ namespace RemoteX.Sketch.InputComponent
             }
         }
 
-        public class AreaStatusChangeEventArgs<T> :EventArgs where T:IEquatable<T>
+        public class AreaStatusChangeEventArgs<T> :EventArgs where T: IComparable
         {
             public Area<T> Area { get; }
             public AreaStatus OldStatus { get; }
