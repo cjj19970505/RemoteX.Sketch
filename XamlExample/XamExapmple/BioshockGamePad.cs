@@ -75,7 +75,7 @@ namespace RemoteX.Sketch.XamExapmple
             LeftStick.AddArea(AreaJoystick<VirtualKeyCode>.Area<VirtualKeyCode>.CreateFromAngle(VirtualKeyCode.VK_W, 30, 150, 0.3f, float.PositiveInfinity));
             LeftStick.AddArea(AreaJoystick<VirtualKeyCode>.Area<VirtualKeyCode>.CreateFromAngle(VirtualKeyCode.VK_A, 120, 240, 0.3f, float.PositiveInfinity));
             LeftStick.AddArea(AreaJoystick<VirtualKeyCode>.Area<VirtualKeyCode>.CreateFromAngle(VirtualKeyCode.VK_S, 210, 330, 0.3f, float.PositiveInfinity));
-            LeftStick.AddArea(AreaJoystick<VirtualKeyCode>.Area<VirtualKeyCode>.CreateFromAngle(VirtualKeyCode.LCONTROL, 0, 360, 1f, float.PositiveInfinity));
+            LeftStick.AddArea(AreaJoystick<VirtualKeyCode>.Area<VirtualKeyCode>.CreateFromAngle(VirtualKeyCode.LCONTROL, 0, 360, 1f, 1.2f));
             LeftStick.RectTransform.AnchorMax = new Vector2(0f, 1f);
             LeftStick.RectTransform.AnchorMin = new Vector2(0f, 1f);
             LeftStick.RectTransform.OffsetMin = new Vector2(26f, -457f);
@@ -158,7 +158,7 @@ namespace RemoteX.Sketch.XamExapmple
             {
                 return;
             }
-            if (DateTime.Now - _LatestRightStickMoveDateTime < TimeSpan.FromMilliseconds(30))
+            if(RightStick.Pressed)
             {
                 return;
             }
