@@ -28,10 +28,11 @@ namespace RemoteX.Sketch.XamExapmple
 
         public BioshockGamePad(IInputManager inputManager) : base(inputManager)
         {
-
+            SketchSize = new Vector2(1600, 900);
         }
         protected override void Setup()
         {
+            
             var bluetoothManager = DependencyService.Get<IManagerManager>().BluetoothManager;
             var deviceInfomationService = new DeviceInfomationServiceBuilder(bluetoothManager).Build();
 

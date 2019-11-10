@@ -21,6 +21,8 @@ namespace RemoteX.Sketch.Forms
         public SketchInputManager SketchInputManager { get; }
         protected SkiaManager SkiaManager { get; private set; }
         protected SKCanvas SKCanvas { get; private set; }
+
+        public Vector2 SketchSize { get; protected set; }
         public SketchPage(IInputManager inputManager)
         {
             InitializeComponent();
@@ -56,8 +58,8 @@ namespace RemoteX.Sketch.Forms
             var skiaManager = sender as SkiaManager;
             SKMatrix.MakeTranslation(0, e.LocalClipBounds.Height);
             var matrix = skiaManager.SketchSpaceToCanvasSpaceMatrix;
-            Sketch.Width = 1600;
-            Sketch.Height = 900;
+            Sketch.Width = SketchSize.X;
+            Sketch.Height = SketchSize.Y;
 
             SKPoint sketchSize = new SKPoint(Sketch.Width, Sketch.Height);
 

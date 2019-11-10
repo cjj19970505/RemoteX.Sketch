@@ -144,7 +144,6 @@ namespace RemoteX.Sketch.XamExapmple
             var matrix = skiaManager.SketchSpaceToCanvasSpaceMatrix;
             Sketch.Width = 1600;
             Sketch.Height = 900;
-            
             SKPoint sketchSize = new SKPoint(Sketch.Width, Sketch.Height);
             
             //matrix.SetScaleTranslate(1f, -1f, e.LocalClipBounds.Width / 2, e.LocalClipBounds.Height / 2);
