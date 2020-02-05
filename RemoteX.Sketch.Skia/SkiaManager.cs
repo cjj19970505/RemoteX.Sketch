@@ -25,6 +25,7 @@ namespace RemoteX.Sketch.Skia
 
         public void Init(Action invalidateViewFunc, SKMatrix sketchSpaceToCanvasSpaceMatrix)
         {
+            SketchEngine.RegisterForNextUpdate(this);
             InvalidateView = invalidateViewFunc;
             SketchSpaceToCanvasSpaceMatrix = sketchSpaceToCanvasSpaceMatrix;
         }
@@ -33,11 +34,15 @@ namespace RemoteX.Sketch.Skia
         {
             base.OnInstantiated();
         }
-
+        public void InvalidCanvas()
+        {
+            SketchEngine.RegisterForNextUpdate(this);
+        }
         protected override void Update()
         {
             base.Update();
             InvalidateView();
+            //SketchEngine.RegisterForNextUpdate(this);
         }
 
         [Obsolete("这边的操作可能不线程安全")]

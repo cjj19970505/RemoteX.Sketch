@@ -16,7 +16,6 @@ namespace RemoteX.Sketch
         public SkiaManager SkiaManager { get; }
         public SketchInfo SketchInfo { get; }
         public Task RunSketchTask;
-        public Timer UpdateTimer { get; }
         public float DesiredFrameRate { get; set; }
         public float Width { get; set; }
         public float Height { get; set; }
@@ -39,9 +38,6 @@ namespace RemoteX.Sketch
             SketchEngine = new SketchEngine();
             UpdateTheadLock = new object();
             DesiredFrameRate = 60;
-            UpdateTimer = new Timer();
-            UpdateTimer.Elapsed += UpdateTimer_Elapsed;
-            UpdateTimer.Interval = 1 / DesiredFrameRate * 1000;
             SkiaManager = SketchEngine.Instantiate<SkiaManager>();
             SketchInfo = SketchEngine.Instantiate<SketchInfo>();
             SketchInfo.Init(this);
@@ -52,12 +48,17 @@ namespace RemoteX.Sketch
         public void Start()
         {
             SketchEngine.Update(0);
-            RunSketchTask = _UpdataTask();
+            //RunSketchTask = _UpdataTask();
+            RunSketchTask = _RunTask();
         }
 
-        private void UpdateTimer_Elapsed(object sender, ElapsedEventArgs e)
+        public Task _RunTask()
         {
-            System.Diagnostics.Debug.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId);
+            Task task = Task.Run(() =>
+            {
+                SketchEngine.Start();
+            });
+            return task;
         }
 
         public Task _UpdataTask()

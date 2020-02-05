@@ -11,12 +11,18 @@ namespace RemoteX.Sketch.InputComponent
     {
         public Vector2 LatestMoveAmount { get; private set; }
         private Vector2 PreviousDelta { get; set; }
+        SkiaManager SkiaManager;
 
         public event EventHandler<Vector2> OnMove;
 
         public TouchpadJoystick():base()
         {
             LatestMoveAmount = Vector2.Zero;
+        }
+        protected override void Start()
+        {
+            base.Start();
+            SkiaManager = SketchEngine.FindObjectByType<SkiaManager>();
         }
         public override IArea StartRegion
         {
@@ -42,18 +48,25 @@ namespace RemoteX.Sketch.InputComponent
             Style = SKPaintStyle.Fill,
             Color = SKColors.Khaki
         };
-
+        protected override void OnJoystickPressed()
+        {
+            base.OnJoystickPressed();
+            SkiaManager.InvalidCanvas();
+        }
         protected override void OnDeltaChanged()
         {
+            base.OnDeltaChanged();
             LatestMoveAmount = Delta - PreviousDelta;
             PreviousDelta = Delta;
             OnMove?.Invoke(this, LatestMoveAmount);
+            SkiaManager.InvalidCanvas();
         }
         protected override void OnJoystickUp()
         {
             base.OnJoystickUp();
             LatestMoveAmount = Vector2.Zero;
             PreviousDelta = Vector2.Zero;
+            SkiaManager.InvalidCanvas();
         }
 
         public void PaintSurface(SkiaManager skiaManager, SKCanvas canvas)

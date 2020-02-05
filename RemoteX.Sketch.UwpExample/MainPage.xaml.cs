@@ -69,11 +69,11 @@ namespace RemoteX.Sketch.UwpExample
             Sketch.Start();
 
             var joystick = Sketch.SketchEngine.Instantiate<ColorJoystick>();
-            joystick.RectTransform.AnchorMax = new Vector2(1, 1);
+            joystick.RectTransform.AnchorMax = new Vector2(0, 0);
             joystick.RectTransform.AnchorMin = new Vector2(0, 0);
             joystick.RectTransform.OffsetMax = new Vector2(-100, -100);
             joystick.RectTransform.OffsetMin = new Vector2(100, 100);
-            joystick.Level = 1;
+            joystick.Level = 3;
 
             var joystick2 = Sketch.SketchEngine.Instantiate<LineAreaJoystick<byte>>();
             joystick2.RectTransform.AnchorMax = new Vector2(0, 0);
@@ -87,7 +87,7 @@ namespace RemoteX.Sketch.UwpExample
             Sketch.SkiaManager.BeforePaint += SkiaManager_BeforePaint;
 
 
-            
+            /*
             var characteristicDict = new Dictionary<Guid, List<CharacteristicProfile>>();
             characteristicDict.Add(KeyboardServiceWrapper.Guid, new List<CharacteristicProfile>()
             {
@@ -111,6 +111,7 @@ namespace RemoteX.Sketch.UwpExample
             var dialog = new BleDeviceSelectorDialog(BluetoothManager, profile);
             dialog.Closed += Dialog_Closed;
             dialog.ShowAsync();
+            */
         }
         DateTime _PreviousEmitDateTime = DateTime.Now;
         List<double> DTList = new List<double>();

@@ -9,6 +9,7 @@ namespace RemoteX.Sketch.InputComponent
 {
     public class ColorJoystick : Joystick, ISkiaRenderer
     {
+        SkiaManager SkiaManager;
         public override IArea StartRegion
         {
             get
@@ -64,11 +65,32 @@ namespace RemoteX.Sketch.InputComponent
         protected override void OnJoystickPressed()
         {
             //throw new NotImplementedException();
+            if (SkiaManager == null)
+            {
+                SkiaManager = SketchEngine.FindObjectByType<SkiaManager>();
+            }
+            SkiaManager.InvalidCanvas();
         }
 
         protected override void OnJoystickUp()
         {
             //throw new NotImplementedException();
+            if (SkiaManager == null)
+            {
+                SkiaManager = SketchEngine.FindObjectByType<SkiaManager>();
+            }
+            SkiaManager.InvalidCanvas();
+        }
+
+        protected override void OnDeltaChanged()
+        {
+            base.OnDeltaChanged();
+            if(SkiaManager == null)
+            {
+                SkiaManager = SketchEngine.FindObjectByType<SkiaManager>();
+            }
+            SkiaManager.InvalidCanvas();
+            
         }
     }
 }

@@ -9,9 +9,19 @@ namespace RemoteX.Sketch.InputComponent
 {
     public class LineAreaJoystick<T>:AreaJoystick<T>, ISkiaRenderer where T:IComparable
     {
+        SkiaManager SkiaManager;
         public LineAreaJoystick():base()
         {
 
+        }
+
+        protected override void Start()
+        {
+            if (SkiaManager == null)
+            {
+                SkiaManager = SketchEngine.FindObjectByType<SkiaManager>();
+            }
+            SkiaManager.InvalidCanvas();
         }
         public override IArea StartRegion
         {
@@ -80,6 +90,32 @@ namespace RemoteX.Sketch.InputComponent
                 
             }
             
+        }
+
+        protected override void OnJoystickPressed()
+        {
+            base.OnJoystickPressed();
+            
+            SkiaManager.InvalidCanvas();
+        }
+        protected override void OnJoystickUp()
+        {
+            base.OnJoystickUp();
+            if (SkiaManager == null)
+            {
+                SkiaManager = SketchEngine.FindObjectByType<SkiaManager>();
+            }
+            SkiaManager.InvalidCanvas();
+        }
+
+        protected override void OnDeltaChanged()
+        {
+            base.OnDeltaChanged();
+            if (SkiaManager == null)
+            {
+                SkiaManager = SketchEngine.FindObjectByType<SkiaManager>();
+            }
+            SkiaManager.InvalidCanvas();
         }
     }
 }

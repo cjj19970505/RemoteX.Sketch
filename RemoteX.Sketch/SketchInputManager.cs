@@ -193,6 +193,7 @@ namespace RemoteX.Sketch
                     _PointerInfoCaches.Enqueue(cache);
                 }
             }
+            SketchEngine.RegisterForNextUpdate(this);
         }
 
         private void InputManager_PointerPressed(object sender, IPointer e)
@@ -235,6 +236,7 @@ namespace RemoteX.Sketch
                     _PointerInfoCaches.Enqueue(cache);
                 }
             }
+            SketchEngine.RegisterForNextUpdate(this);
         }
 
         private void InputManager_PointerMoved(object sender, IPointer e)
@@ -274,6 +276,7 @@ namespace RemoteX.Sketch
                     _PointerInfoCaches.Enqueue(cache);
                 }
             }
+            SketchEngine.RegisterForNextUpdate(this);
         }
 
         private void InputManager_PointerExited(object sender, IPointer e)
@@ -317,6 +320,7 @@ namespace RemoteX.Sketch
                 }
 
             }
+            SketchEngine.RegisterForNextUpdate(this);
 
         }
         private void InputManager_PointerEntered(object sender, IPointer e)
@@ -331,6 +335,7 @@ namespace RemoteX.Sketch
             {
                 _PointerInfoCaches.Enqueue(cache);
             }
+            SketchEngine.RegisterForNextUpdate(this);
         }
 
 

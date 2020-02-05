@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace RemoteX.Sketch.CoreModule
 {
@@ -14,7 +15,10 @@ namespace RemoteX.Sketch.CoreModule
 
         private readonly List<SketchObject> _SketchObjectList;
         private readonly List<SketchObject> _ReadyToInstantiateSketchObjectList;
-        
+        private SemaphoreSlim _UpdateSemaphore;
+
+        public readonly object _ReadyToUpdateObjectListLock;
+        public readonly List<SketchObject> _ReadyToUpdateObjectList;
 
         public IReadOnlyList<SketchObject> SketchObjectList
         {
@@ -55,8 +59,47 @@ namespace RemoteX.Sketch.CoreModule
             _ReadyToInstantiateSketchObjectList = new List<SketchObject>();
             Time = new Time();
             UpdateLock = new object();
+            _UpdateSemaphore = new SemaphoreSlim(0, 1);
+            _ReadyToUpdateObjectListLock = new object();
+            _ReadyToUpdateObjectList = new List<SketchObject>();
 
         }
+
+        /// <summary>
+        /// 这个函数是线程安全的，只要一个物体注册了这个就可以被Update，并且激活整个引擎的Update
+        /// </summary>
+        /// <param name="sketchObject"></param>
+        public void RegisterForNextUpdate(SketchObject sketchObject)
+        {
+            lock (_ReadyToUpdateObjectListLock)
+            {
+                if (!_ReadyToUpdateObjectList.Contains(sketchObject))
+                {
+                    _ReadyToUpdateObjectList.Add(sketchObject);
+                }
+            }
+            try
+            {
+                _UpdateSemaphore.Release();
+            }
+            catch (SemaphoreFullException)
+            {
+
+            }
+        }
+
+        private void RegisterForNextUpdate()
+        {
+            try
+            {
+                _UpdateSemaphore.Release();
+            }
+            catch (SemaphoreFullException)
+            {
+
+            }
+        }
+
         /// <summary>
         /// Object will be created, but was added to the scene in next frame
         /// </summary>
@@ -68,7 +111,42 @@ namespace RemoteX.Sketch.CoreModule
             skiaObject.SketchEngine = this;
             _ReadyToInstantiateSketchObjectList.Add(skiaObject);
             skiaObject.OnInstantiated();
+            RegisterForNextUpdate();
             return skiaObject;
+        }
+
+
+        public void Start()
+        {
+            List<SketchObject> readyToUpdateList = new List<SketchObject>();
+            while (true)
+            {
+                _UpdateSemaphore.Wait();
+                
+                lock (_ReadyToUpdateObjectListLock)
+                {
+                    readyToUpdateList.AddRange(_ReadyToUpdateObjectList);
+                    _ReadyToUpdateObjectList.Clear();
+                }
+                //Time.DeltaTime = deltaTime;
+                foreach (var sketchObject in _ReadyToInstantiateSketchObjectList)
+                {
+                    _SketchObjectList.Add(sketchObject);
+                    sketchObject.IsInstantiated = true;
+                    
+                    //sketchObject.OnInstantiated();
+                }
+                foreach(var sketchObject in _ReadyToInstantiateSketchObjectList)
+                {
+                    sketchObject.Start();
+                }
+                _ReadyToInstantiateSketchObjectList.Clear();
+                foreach (var updateObject in readyToUpdateList)
+                {
+                    updateObject.Update();
+                }
+                readyToUpdateList.Clear();
+            }
         }
 
         /// <summary>

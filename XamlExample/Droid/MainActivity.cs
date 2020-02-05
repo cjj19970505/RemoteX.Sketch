@@ -30,7 +30,7 @@ namespace RemoteX.Sketch.XamExapmple.Droid
             ManagerManagerFragment = DependencyService.Get<IManagerManager>() as ManagerManagerFragment;
             FragmentManager.BeginTransaction().Add(ManagerManagerFragment, "ManagerManager").Commit();
 
-            this.RequestedOrientation = ScreenOrientation.Portrait;
+            this.RequestedOrientation = ScreenOrientation.Landscape;
 
             LoadApplication(new App());
         }
