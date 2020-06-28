@@ -131,10 +131,10 @@
       <Name>RemoteX.Sketch.Bluetooth</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Content Include="..\AutoHotkey.Interop\x86\v2_AutoHotkey.dll">
-      <Link>x86\v2_AutoHotkey.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="x86\v2_AutoHotkey.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
